@@ -1,0 +1,29 @@
+Package: gridmappr
+Title: Gridmap Allocations with Approximate Spatial Arrangements 
+Version: 0.0.0.9000
+Authors@R: 
+    person("Roger", "Beecham", , "r.j.beecham@leeds.ac.uk", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-8563-7251"))
+Maintainer: Roger Beecham <r.j.beecham@leeds.ac.uk>
+Description: Takes a set of geographic point locations and a grid of stated number of rows and places each point in a grid cell such that the distance between geographic and grid locations is minomised.  
+Imports: 
+    dplyr,
+    ompr,
+    ompr.roi,
+    purrr,
+    ROI.plugin.glpk,
+    scales,
+    tibble
+Suggests: 
+    ggplot2,
+    testthat
+Depends: 
+    R (>= 3.5.0)
+License: GPL (>= 3)
+Language: en-UK
+BugReports: https://github.com/rogerbeecham/gridmappr/issues
+URL: https://github.com/rogerbeecham/gridmappr
+RoxygenNote: 7.2.3
+LazyData: true
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
