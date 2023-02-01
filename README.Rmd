@@ -81,7 +81,7 @@ pts <- london_boroughs |> st_drop_geometry() |> select(area_name, x=easting, y=n
 solution <- points_to_grid(pts, n_row, n_col, .6)
 ```
 
-``` {r, lb-no-spacers-plot, message=FALSE, warning=FALSE}
+``` {r, lb-no-spacers-plot, eval=FALSE}
 gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |> 
   ggplot() + 
   geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
@@ -94,6 +94,8 @@ realmap <- london_boroughs |>
 
 realmap + gridmap
 ```
+
+![](./man/figures/lb-no-spacers.svg)
 
 
 Adding explicit spacers (light grey) for grid cells that cannot have points allocated to them. Doing this, we can get to the [LondonSquared](https://github.com/aftertheflood/londonsquared) layout.
@@ -113,7 +115,7 @@ pts <- london_boroughs |> st_drop_geometry() |> select(area_name, x=easting, y=n
 solution <- points_to_grid(pts, n_row, n_col, 1, spacers)
 ```
 
-``` {r, lb-spacers-plot, message=FALSE, warning=FALSE}
+``` {r, lb-spacers-plot,eval=FALSE}
 gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |> 
   ggplot() + 
   geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
@@ -125,6 +127,9 @@ gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |>
 
 realmap + gridmap
 ```
+
+![](./man/figures/lb-spacers.svg)
+
 
 ### US States
 
@@ -142,7 +147,7 @@ pts <- us_states |> st_drop_geometry() |> select(STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .6)
 ```
 
-``` {r, us-no-spacers-plot, message=FALSE, warning=FALSE}
+``` {r, us-no-spacers-plot, eval=FALSE}
 gridmap <- make_grid(us_states, n_row, n_col) |> left_join(solution) |> 
   ggplot() + geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
   geom_text(aes(x=x, y=y, label=STUSPS), size=4, colour="#451C14") +
@@ -156,6 +161,7 @@ realmap <- us_states |>
 realmap + gridmap
 ```
 
+![](./man/figures/us-no-spacers.svg)
 
 ```{r, us-spacers, message=FALSE, warning=FALSE}
 n_row <- 7
@@ -169,7 +175,7 @@ pts <- us_states |> st_drop_geometry() |> select(STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .9, spacers)
 ```
 
-``` {r, us-spacers-plot, message=FALSE, warning=FALSE}
+``` {r, us-spacers-plot, eval=FALSE}
 gridmap <- make_grid(us_states, n_row, n_col) |> left_join(solution) |> 
   ggplot() + 
   geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
@@ -182,6 +188,8 @@ gridmap <- make_grid(us_states, n_row, n_col) |> left_join(solution) |>
 
 realmap + gridmap
 ```
+
+![](./man/figures/us-spacers.svg)
 
 ## Example applications
 

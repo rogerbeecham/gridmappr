@@ -102,7 +102,7 @@ realmap <- london_boroughs |>
 realmap + gridmap
 ```
 
-<img src="man/figures/README-lb-no-spacers-plot-1.png" width="100%" />
+![](./man/figures/lb-no-spacers.svg)
 
 Adding explicit spacers (light grey) for grid cells that cannot have
 points allocated to them. Doing this, we can get to the
@@ -135,7 +135,7 @@ gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |>
 realmap + gridmap
 ```
 
-<img src="man/figures/README-lb-spacers-plot-1.png" width="100%" />
+![](./man/figures/lb-spacers.svg)
 
 ### US States
 
@@ -167,7 +167,7 @@ realmap <- us_states |>
 realmap + gridmap
 ```
 
-<img src="man/figures/README-us-no-spacers-plot-1.png" width="100%" />
+![](./man/figures/us-no-spacers.svg)
 
 ``` r
 n_row <- 7
@@ -195,7 +195,7 @@ gridmap <- make_grid(us_states, n_row, n_col) |> left_join(solution) |>
 realmap + gridmap
 ```
 
-<img src="man/figures/README-us-spacers-plot-1.png" width="100%" />
+![](./man/figures/us-spacers.svg)
 
 ## Example applications
 
