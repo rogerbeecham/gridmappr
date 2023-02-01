@@ -38,21 +38,29 @@ The main allocation function to call is `points_to_grid()`. This will return gri
 
 You can install the development version of `gridmappr` from [GitHub](https://github.com/) with:
 
-``` {r, install_github, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+``` {r, install_github, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("rogerbeecham/gridmappr")
-````
+```
 
-``` {r, load_packages, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
+``` {r, load_packages, include = FALSE}
 # For reproducing this document.
 library(ggplot2)
 library(ggforce)
 library(tidyr)
 library(dplyr)
+library(purrr)
 library(sf)
 library(patchwork)
 library(stringr)
 library(gridmappr)
+```
+
+
+```{r hidden_options, include=FALSE}
+#misc options
+options(width = 90)
+theme_set(theme_void())
 ```
 
 ## Example allocations
@@ -65,7 +73,7 @@ For generating a gridmap layout of 33 London boroughs, we first try an 8x8 regul
 * `n_col` Set to 8
 * `compactness` Set to .6, attempting to preserve the geographic layout with a degree of compactness around the grid centre.
 
-```{r, lb-no-spacers, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r, lb-no-spacers, message=FALSE, warning=FALSE}
 n_row <- 8
 n_col <- 8
 # Define points 
@@ -73,33 +81,16 @@ pts <- london_boroughs |> st_drop_geometry() |> select(area_name, x=easting, y=n
 solution <- points_to_grid(pts, n_row, n_col, .6)
 ```
 
-``` {r, lb-no-spacers-plot, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
-grid_sf <- st_sf(geom=st_make_grid(london_boroughs |> mutate(id=row_number()), n=c(n_col,n_row), what="polygons")) 
-grid_sf_ind <- list()
- for(row in 1:n_row) {
-    for(col in 1:n_col)
-    {
-        grid_sf_ind[[length(grid_sf_ind)+1]] <- tibble(col=col, row=row)
-      }
-    }
-grid_sf_ind  <- map_df(grid_sf_ind, ~bind_rows(.x))
-grid_sf <- grid_sf |> bind_cols(grid_sf_ind)  
-grid_centroids <- grid_sf %>% st_centroid() %>% st_coordinates() %>% as_tibble() %>%
-  rename("east"="X", "north"="Y")
-# Add to grid_sf.
-grid_sf <- grid_sf %>%
-  mutate(east=grid_centroids$east, north=grid_centroids$north)
-rm(grid_centroids)
-
-gridmap <- grid_sf |> left_join(solution) |> 
-  ggplot() + geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
-  geom_text(aes(x=east, y=north, label=str_extract(area_name, "^.{3}")), size=4, colour="#451C14") +
-  theme_void()
+``` {r, lb-no-spacers-plot}
+gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |> 
+  ggplot() + 
+  geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
+  geom_text(aes(x=x, y=y, label=str_extract(area_name, "^.{3}")), size=4, colour="#451C14") 
 
 realmap <- london_boroughs |> 
-  ggplot() + geom_sf(fill="#F1DDD1", colour="#ffffff", linewidth=.6) +
-  geom_text(aes(x=easting, y=northing, label=word(area_name,1)), size=2, colour="#451C14") +
-  theme_void()
+  ggplot() + 
+  geom_sf(fill="#F1DDD1", colour="#ffffff", linewidth=.6) +
+  geom_text(aes(x=easting, y=northing, label=word(area_name,1)), size=2, colour="#451C14")
 
 realmap + gridmap
 ```
@@ -108,7 +99,7 @@ realmap + gridmap
 Adding explicit spacers (light grey) for grid cells that cannot have points allocated to them. Doing this, we can get to the [LondonSquared](https://github.com/aftertheflood/londonsquared) layout.
 
 
-```{r, lb-spacers, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r, lb-spacers, include=FALSE}
 n_row <- 7
 n_col <- 8
 spacers <- list(
@@ -123,38 +114,15 @@ pts <- london_boroughs |> st_drop_geometry() |> select(area_name, x=easting, y=n
 solution <- points_to_grid(pts, n_row, n_col, 1, spacers)
 ```
 
-``` {r, lb-spacers-plot, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
-grid_sf <- st_sf(geom=st_make_grid(london_boroughs |> mutate(id=row_number()), n=c(n_col,n_row), what="polygons")) 
-grid_sf_ind <- list()
- for(row in 1:n_row) {
-    for(col in 1:n_col)
-    {
-        grid_sf_ind[[length(grid_sf_ind)+1]] <- tibble(col=col, row=row)
-      }
-    }
-grid_sf_ind  <- map_df(grid_sf_ind, ~bind_rows(.x))
-grid_sf <- grid_sf |> bind_cols(grid_sf_ind)  
-grid_centroids <- grid_sf %>% st_centroid() %>% st_coordinates() %>% as_tibble() %>%
-  rename("east"="X", "north"="Y")
-# Add to grid_sf.
-grid_sf <- grid_sf %>%
-  mutate(east=grid_centroids$east, north=grid_centroids$north)
-rm(grid_centroids)
-
-gridmap <- grid_sf |> left_join(solution) |> 
+``` {r, lb-spacers-plot}
+gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |> 
   ggplot() + 
   geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
   geom_sf(
     data=. %>% inner_join(spacers |> map_df(~bind_rows(row=.x[1], col=.x[2]))),
     colour="#EEEEEE", linewidth=.6, fill="#FAFAFA",
   ) +
-  geom_text(aes(x=east, y=north, label=str_extract(area_name, "^.{3}")), size=4, colour="#451C14") +
-  theme_void()
-
-realmap <- london_boroughs |> 
-  ggplot() + geom_sf(fill="#F1DDD1", colour="#ffffff", linewidth=.4) +
-  geom_text(aes(x=easting, y=northing, label=word(area_name,1)), size=2, colour="#451C14") +
-  theme_void()
+  geom_text(aes(x=x, y=y, label=str_extract(area_name, "^.{3}")), size=4, colour="#451C14")
 
 realmap + gridmap
 ```
@@ -167,7 +135,7 @@ Generating a gridmap layout of US states.
 * `n_col` Set to 12
 * `compactness` Set to .8
 
-```{r, us-no-spacers, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r, us-no-spacers, include=FALSE}
 n_row <- 7
 n_col <- 12
 # Define points 
@@ -175,25 +143,8 @@ pts <- us_states |> st_drop_geometry() |> select(STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .6)
 ```
 
-``` {r, us-no-spacers-plot, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
-grid_sf <- st_sf(geom=st_make_grid(us_states |> mutate(id=row_number()), n=c(n_col,n_row), what="polygons")) 
-grid_sf_ind <- list()
- for(row in 1:n_row) {
-    for(col in 1:n_col)
-    {
-        grid_sf_ind[[length(grid_sf_ind)+1]] <- tibble(col=col, row=row)
-      }
-    }
-grid_sf_ind  <- map_df(grid_sf_ind, ~bind_rows(.x))
-grid_sf <- grid_sf |> bind_cols(grid_sf_ind)  
-grid_centroids <- grid_sf %>% st_centroid() %>% st_coordinates() %>% as_tibble() %>%
-  rename("x"="X", "y"="Y")
-# Add to grid_sf.
-grid_sf <- grid_sf %>%
-  mutate(x=grid_centroids$x, y=grid_centroids$y)
-rm(grid_centroids)
-
-gridmap <- grid_sf |> left_join(solution |> select(-c(x,y))) |> 
+``` {r, us-no-spacers-plot}
+gridmap <- make_grid(us_states, n_row, n_col) |> left_join(solution) |> 
   ggplot() + geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
   geom_text(aes(x=x, y=y, label=STUSPS), size=4, colour="#451C14") +
   theme_void()
@@ -207,8 +158,7 @@ realmap + gridmap
 ```
 
 
-
-```{r, us-spacers, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r, us-spacers, include=FALSE}
 n_row <- 7
 n_col <- 12
 spacers <- list(
@@ -220,36 +170,15 @@ pts <- us_states |> st_drop_geometry() |> select(STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .9, spacers)
 ```
 
-``` {r, us-spacers-plot, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
-grid_sf <- st_sf(geom=st_make_grid(us_states |> mutate(id=row_number()), n=c(n_col,n_row), what="polygons")) 
-grid_sf_ind <- list()
- for(row in 1:n_row) {
-    for(col in 1:n_col)
-    {
-        grid_sf_ind[[length(grid_sf_ind)+1]] <- tibble(col=col, row=row)
-      }
-    }
-grid_sf_ind  <- map_df(grid_sf_ind, ~bind_rows(.x))
-grid_sf <- grid_sf |> bind_cols(grid_sf_ind)  
-grid_centroids <- grid_sf %>% st_centroid() %>% st_coordinates() %>% as_tibble() %>%
-  rename("x"="X", "y"="Y")
-# Add to grid_sf.
-grid_sf <- grid_sf %>%
-  mutate(x=grid_centroids$x, y=grid_centroids$y)
-rm(grid_centroids)
-
-grid_sf |> left_join(solution |> select(-c(x,y))) |> 
-  ggplot() + geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
+``` {r, us-spacers-plot}
+gridmap <- make_grid(us_states, n_row, n_col) |> left_join(solution) |> 
+  ggplot() + 
+  geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
   geom_sf(
     data=. %>% inner_join(spacers |> map_df(~bind_rows(row=.x[1], col=.x[2]))),
     colour="#EEEEEE", linewidth=.6, fill="#FAFAFA",
   ) +
   geom_text(aes(x=x, y=y, label=STUSPS), size=4, colour="#451C14") +
-  theme_void()
-
-realmap <- us_states |> 
-  ggplot() + geom_sf(fill="#F1DDD1", colour="#ffffff", linewidth=.4) +
-  geom_text(aes(x=x, y=y, label=STUSPS), size=2, colour="#451C14") +
   theme_void()
 
 realmap + gridmap

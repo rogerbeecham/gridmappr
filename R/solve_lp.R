@@ -39,7 +39,7 @@ solve_lp <- function(pts, grd, compactness) {
     # Set objective (cost is distance between pts and grd positions).
     set_objective(sum_expr(cost(grd, pts, grd_i, pts_i) * x[grd_i, pts_i], grd_i= 1:n_grd, pts_i = 1:n_pts), "min")
 
-  result <- solve_model(model, with_ROI(solver = "glpk", verbose = TRUE))
+  result <- solve_model(model, with_ROI(solver = "glpk"))
   # Return row IDs for tibble on which grd and pts was defined and to which pts are matched to grd
   return(get_solution(result, x[grd,pt]) |> filter(value==1) |> select(grd, pt) )
 }

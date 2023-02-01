@@ -44,5 +44,5 @@ points_to_grid <- function(pts, n_row, n_col, compactness = 1, spacers = list())
   ) |>
   left_join(grd |> mutate(id=row_number()), by=c("grd"="id")) |>
     left_join(pts |> mutate(id=row_number()),  by=c("pt"="id")) |>
-    select(-c(grd, pt))
+    select(-c(grd, pt, x, y))
 }
