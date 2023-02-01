@@ -21,5 +21,6 @@ Constructs a 2D grid of a given number of rows and columns over an sf object.
 }
 \examples{
 library(gridmappr)
+library(sf)
 grid <- make_grid(london_boroughs, 8, 8)
 }

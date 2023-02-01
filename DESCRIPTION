@@ -13,6 +13,7 @@ Imports:
     purrr,
     ROI.plugin.glpk,
     scales,
+    sf,
     tibble
 Suggests: 
     ggplot2,
