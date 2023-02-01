@@ -13,6 +13,10 @@ knitr::opts_chunk$set(
 
 # gridmappr
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 `gridmappr` is an R package that automates the process of generating [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a set of geographic point locations, it creates a grid (with stated *row, column* dimensions) and places each point in a grid cell such that the distance between points in geographic space and that within the grid space is minimised. The package is an R implementation of Jo Wood's Observable notebooks on [Linear Programming](https://observablehq.com/@jwolondon/hello-linear-programming) solvers and their application to the [Grid map allocation](https://observablehq.com/@jwolondon/gridmap-allocation?collection=@jwolondon/utilities) problem.
 
 ## Gridmap allocation using compactness with `points_to_grid()` 

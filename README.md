@@ -1,6 +1,11 @@
 
 # gridmappr
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 `gridmappr` is an R package that automates the process of generating
 [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a
 set of geographic point locations, it creates a grid (with stated *row,
