@@ -30,7 +30,7 @@ solve_lp <- function(pts, grd, compactness) {
   n_grd <- nrow(grd)
   n_pts <- nrow(pts)
   model <- MIPModel() |>
-    # 1 if grd gets assigned a pts.
+    # 1 if grd gets assigned a pt.
     add_variable(x[grd_i, pts_i], grd_i = 1:n_grd, pts_i = 1:n_pts, type = "binary") |>
     # Every point needs to be assigned to *one* grid cell.
     add_constraint(sum_expr(x[grd_i, pts_i], grd_i = 1:n_grd) == 1, pts_i = 1:n_pts) |>

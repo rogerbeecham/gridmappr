@@ -1,4 +1,4 @@
-#' @title pts_to_grd
+#' @title points_to_grid
 #'
 #' @description From https://observablehq.com/@jwolondon/gridmap-allocation.
 #' Returns an LP solution allocating 2D points to a grid.
@@ -22,8 +22,8 @@
 #'                 2,1,
 #'                 3,3,
 #'                 3,4)
-#' pts_to_grd(pts, n_row=3,n_col=3,spacers=list())
-pts_to_grd <- function(pts, n_row, n_col, compactness = 1, spacers = list()) {
+#' points_to_grid(pts, n_row=3,n_col=3,spacers=list())
+points_to_grid <- function(pts, n_row, n_col, compactness = 1, spacers = list()) {
   grd <- grid_locations(n_row, n_col, spacers)
   if( nrow(pts) > nrow(grd) ) {
     print(paste("Cannot allocate ", nrow(pts),
@@ -38,7 +38,7 @@ pts_to_grd <- function(pts, n_row, n_col, compactness = 1, spacers = list()) {
   }
 
   grd_pos <- solve_lp(
-    pts_normalised(pts, grd, compactness),
+    points_normalised(pts, grd, compactness),
     grd,
     compactness
   ) |>
