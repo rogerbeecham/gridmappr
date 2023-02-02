@@ -74,7 +74,7 @@ For generating a gridmap layout of 33 London boroughs, we first try an 8x8 regul
 * `n_col` Set to 8
 * `compactness` Set to .6, attempting to preserve the geographic layout with a degree of compactness around the grid centre.
 
-```{r, lb-no-spacers, message=FALSE, warning=FALSE}
+```{r, lb-no-spacers, eval=FALSE}
 n_row <- 8
 n_col <- 8
 pts <- london_boroughs |> st_drop_geometry() |> select(area_name, x=easting, y=northing)
@@ -95,13 +95,18 @@ realmap <- london_boroughs |>
 realmap + gridmap
 ```
 
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths=c(1.2,1))
+ggsave(filename=here("man","figures","lb-no-spacers.svg"), plot=plot,width=8, height=5)
+```
+
 ![](./man/figures/lb-no-spacers.svg)
 
 
 Adding explicit spacers (light grey) for grid cells that cannot have points allocated to them. Doing this, we can get to the [LondonSquared](https://github.com/aftertheflood/londonsquared) layout.
 
 
-```{r, lb-spacers, message=FALSE, warning=FALSE}
+```{r, lb-spacers, eval=FALSE}
 n_row <- 7
 n_col <- 8
 spacers <- list(
@@ -115,7 +120,7 @@ pts <- london_boroughs |> st_drop_geometry() |> select(area_name, x=easting, y=n
 solution <- points_to_grid(pts, n_row, n_col, 1, spacers)
 ```
 
-``` {r, lb-spacers-plot,eval=FALSE}
+``` {r, lb-spacers-plot, eval=FALSE}
 gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |> 
   ggplot() + 
   geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
@@ -126,6 +131,11 @@ gridmap <- make_grid(london_boroughs, n_row, n_col) |> left_join(solution)  |>
   geom_text(aes(x=x, y=y, label=str_extract(area_name, "^.{3}")), size=4, colour="#451C14")
 
 realmap + gridmap
+```
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths=c(1.2,1))
+ggsave(filename=here("man","figures","lb-spacers.svg"), plot=plot,width=8, height=5)
 ```
 
 ![](./man/figures/lb-spacers.svg)
@@ -139,10 +149,9 @@ Generating a gridmap layout of US states.
 * `n_col` Set to 12
 * `compactness` Set to .8
 
-```{r, us-no-spacers, message=FALSE, warning=FALSE}
+```{r, us-no-spacers, eval=FALSE}
 n_row <- 7
 n_col <- 12
-# Define points 
 pts <- us_states |> st_drop_geometry() |> select(STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .6)
 ```
@@ -161,9 +170,14 @@ realmap <- us_states |>
 realmap + gridmap
 ```
 
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths=c(1.2,1))
+ggsave(filename=here("man","figures","us-no-spacers.svg"), plot=plot,width=10, height=5)
+```
+
 ![](./man/figures/us-no-spacers.svg)
 
-```{r, us-spacers, message=FALSE, warning=FALSE}
+```{r, us-spacers, eval=FALSE}
 n_row <- 7
 n_col <- 12
 spacers <- list(
@@ -189,7 +203,48 @@ gridmap <- make_grid(us_states, n_row, n_col) |> left_join(solution) |>
 realmap + gridmap
 ```
 
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths=c(1.2,1))
+ggsave(filename=here("man","figures","us-spacers.svg"), plot=plot,width=10, height=5)
+```
+
 ![](./man/figures/us-spacers.svg)
+
+
+### Leicestershire Wards 
+
+```{r, leics, eval=FALSE}
+n_row <- 14
+n_col <- 14
+pts <- leics_wards |> st_drop_geometry() |> select(ward_name, x=easting, y=northing)
+solution <- points_to_grid(pts, n_row, n_col, 0)
+```
+
+``` {r, leics-plot, eval=FALSE}
+gridmap <- make_grid(leics_wards, n_row, n_col) |> left_join(solution) |> 
+  ggplot() + 
+  geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
+  geom_sf(
+    data=. %>% inner_join(spacers |> map_df(~bind_rows(row=.x[1], col=.x[2]))),
+    colour="#EEEEEE", linewidth=.6, fill="#FAFAFA",
+  ) +
+  geom_text(aes(x=x, y=y, label=str_extract(ward_name, "^.{3}")), size=4, colour="#451C14") +
+  theme_void()
+
+realmap <- leics_wards |> 
+  ggplot() + geom_sf(fill="#F1DDD1", colour="#ffffff", linewidth=.4) +
+  geom_text(aes(x=easting, y=northing, label=str_extract(ward_name, "^.{3}")), size=2, colour="#451C14") +
+  theme_void()
+realmap + gridmap
+```
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths=c(1.2,1))
+ggsave(filename=here("man","figures","leics.svg"), plot=plot,width=12, height=6)
+}
+```
+![](./man/figures/leics.svg)
 
 ## Example applications
 

@@ -148,7 +148,6 @@ Generating a gridmap layout of US states.
 ``` r
 n_row <- 7
 n_col <- 12
-# Define points 
 pts <- us_states |> st_drop_geometry() |> select(STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .6)
 ```
@@ -196,6 +195,35 @@ realmap + gridmap
 ```
 
 ![](./man/figures/us-spacers.svg)
+
+### Leicestershire Wards
+
+``` r
+n_row <- 14
+n_col <- 14
+pts <- leics_wards |> st_drop_geometry() |> select(ward_name, x=easting, y=northing)
+solution <- points_to_grid(pts, n_row, n_col, 0)
+```
+
+``` r
+gridmap <- make_grid(leics_wards, n_row, n_col) |> left_join(solution) |> 
+  ggplot() + 
+  geom_sf(fill="transparent", colour="#EEEEEE", linewidth=.6) +
+  geom_sf(
+    data=. %>% inner_join(spacers |> map_df(~bind_rows(row=.x[1], col=.x[2]))),
+    colour="#EEEEEE", linewidth=.6, fill="#FAFAFA",
+  ) +
+  geom_text(aes(x=x, y=y, label=str_extract(ward_name, "^.{3}")), size=4, colour="#451C14") +
+  theme_void()
+
+realmap <- leics_wards |> 
+  ggplot() + geom_sf(fill="#F1DDD1", colour="#ffffff", linewidth=.4) +
+  geom_text(aes(x=easting, y=northing, label=str_extract(ward_name, "^.{3}")), size=2, colour="#451C14") +
+  theme_void()
+realmap + gridmap
+```
+
+![](./man/figures/leics.svg)
 
 ## Example applications
 
