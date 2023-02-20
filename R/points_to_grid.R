@@ -16,25 +16,30 @@
 #' @export
 #' @examples
 #' library(tibble)
-#' pts <- tribble(~x,~y,
-#'                 2,4,
-#'                 1,5,
-#'                 2,1,
-#'                 3,3,
-#'                 3,4)
-#' points_to_grid(pts, n_row=3,n_col=3,spacers=list())
+#' pts <- tribble(
+#'   ~x, ~y,
+#'   2, 4,
+#'   1, 5,
+#'   2, 1,
+#'   3, 3,
+#'   3, 4
+#' )
+#' points_to_grid(pts, n_row = 3, n_col = 3, spacers = list())
 points_to_grid <- function(pts, n_row, n_col, compactness = 1, spacers = list()) {
   grd <- grid_locations(n_row, n_col, spacers)
-  if( nrow(pts) > nrow(grd) ) {
-    print(paste("Cannot allocate ", nrow(pts),
-                " points to a grid with only ",
-                nrow(grd),
-                " cells."))
+  if (nrow(pts) > nrow(grd)) {
+    print(paste(
+      "Cannot allocate ", nrow(pts),
+      " points to a grid with only ",
+      nrow(grd),
+      " cells."
+    ))
     return(
       tibble(
-        row=rep(NA,times=n_row, each=n_col),
-        col=rep(NA,times=n_row, each=n_col))
+        row = rep(NA, times = n_row, each = n_col),
+        col = rep(NA, times = n_row, each = n_col)
       )
+    )
   }
 
   grd_pos <- solve_lp(
@@ -42,7 +47,7 @@ points_to_grid <- function(pts, n_row, n_col, compactness = 1, spacers = list())
     grd,
     compactness
   ) |>
-  left_join(grd |> mutate(id=row_number()), by=c("grd"="id")) |>
-    left_join(pts |> mutate(id=row_number()),  by=c("pt"="id")) |>
+    left_join(grd |> mutate(id = row_number()), by = c("grd" = "id")) |>
+    left_join(pts |> mutate(id = row_number()), by = c("pt" = "id")) |>
     select(-c(grd, pt, x, y))
 }

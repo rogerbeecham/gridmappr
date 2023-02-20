@@ -15,24 +15,27 @@
 #' @return A tibble of grid coordinates in the same order as the original array of input points.
 #'
 #' @export
-#' @examples grid_locations(n_row=3,n_col=3,spacers=list())
-grid_locations <- function(n_row, n_col, spacers=list()) {
+#' @examples grid_locations(n_row = 3, n_col = 3, spacers = list())
+grid_locations <- function(n_row, n_col, spacers = list()) {
   grd <- list()
-  for(row in 1:n_row) {
-    for(col in 1:n_col)
+  for (row in 1:n_row) {
+    for (col in 1:n_col)
     {
       if (!is_spacer(row, col, spacers)) {
-        grd[[length(grd) + 1]] <- tibble(row=row, col=col)
+        grd[[length(grd) + 1]] <- tibble(row = row, col = col)
       }
     }
   }
-  grd <- map_df(grd, ~bind_rows(.x))
-  return (grd)
+  grd <- map_df(grd, ~ bind_rows(.x))
+  return(grd)
 }
 
-is_spacer <- function(r, c, spacers){
+is_spacer <- function(r, c, spacers) {
   matched <- FALSE
-  map(spacers, function(.x) {if(.x[1]==r && .x[2]==c) {matched<<-TRUE}})
-  return (matched)
+  map(spacers, function(.x) {
+    if (.x[1] == r && .x[2] == c) {
+      matched <<- TRUE
+    }
+  })
+  return(matched)
 }
-

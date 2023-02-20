@@ -22,12 +22,14 @@ Returns an LP solution allocating 2D points to a grid.
 }
 \examples{
 library(tibble)
-pts <- tribble(~x,~y,
-                2,4,
-                1,5,
-                2,1,
-                3,3,
-                3,4)
-grd <- grid_locations(n_row=3,n_col=3,spacers=list())
+pts <- tribble(
+  ~x, ~y,
+  2, 4,
+  1, 5,
+  2, 1,
+  3, 3,
+  3, 4
+)
+grd <- grid_locations(n_row = 3, n_col = 3, spacers = list())
 points_normalised(pts, grd, .6)
 }

@@ -19,17 +19,21 @@
 #' grid <- make_grid(london_boroughs, 8, 8)
 make_grid <- function(sf_file, n_row, n_col) {
   grid_sf <- st_sf(
-    geom=st_make_grid(sf_file |> mutate(id=row_number()),
-                      n=c(n_col,n_row), what="polygons")
+    geom = st_make_grid(sf_file |> mutate(id = row_number()),
+      n = c(n_col, n_row), what = "polygons"
     )
+  )
   grid_index <- map2_df(
-    rep(1:n_row, each=n_col),  rep(1:n_col, times=n_row),
-    ~tibble(col=.y, row=.x)
-    )
+    rep(1:n_row, each = n_col), rep(1:n_col, times = n_row),
+    ~ tibble(col = .y, row = .x)
+  )
   grid_sf <- grid_sf |> bind_cols(grid_index)
   st_agr(grid_sf) <- "constant"
-  grid_centroids <- grid_sf |>  st_centroid() |>  st_coordinates() |>  as_tibble()
+  grid_centroids <- grid_sf |>
+    st_centroid() |>
+    st_coordinates() |>
+    as_tibble()
   # Add centroids to to grid_sf.
   grid_sf <- grid_sf |>
-    mutate(x=grid_centroids$X, y=grid_centroids$Y)
+    mutate(x = grid_centroids$X, y = grid_centroids$Y)
 }

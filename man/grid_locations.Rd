@@ -22,5 +22,5 @@ Creates a list of grid locations of a stated size, with spacer positions
 removed.
 }
 \examples{
-grid_locations(n_row=3,n_col=3,spacers=list())
+grid_locations(n_row = 3, n_col = 3, spacers = list())
 }

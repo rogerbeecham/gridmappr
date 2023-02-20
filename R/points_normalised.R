@@ -15,19 +15,25 @@
 #' @export
 #' @examples
 #' library(tibble)
-#' pts <- tribble(~x,~y,
-#'                 2,4,
-#'                 1,5,
-#'                 2,1,
-#'                 3,3,
-#'                 3,4)
-#' grd <- grid_locations(n_row=3,n_col=3,spacers=list())
+#' pts <- tribble(
+#'   ~x, ~y,
+#'   2, 4,
+#'   1, 5,
+#'   2, 1,
+#'   3, 3,
+#'   3, 4
+#' )
+#' grd <- grid_locations(n_row = 3, n_col = 3, spacers = list())
 #' points_normalised(pts, grd, .6)
 points_normalised <- function(pts, grd, compactness) {
   # Scale to rectangle centred at middle of gird.
   # Size of grid inversely proportional to compactness
-  n_rows <- grd |> distinct(row) |> nrow()
-  n_cols <- grd |> distinct(col) |> nrow()
+  n_rows <- grd |>
+    distinct(row) |>
+    nrow()
+  n_cols <- grd |>
+    distinct(col) |>
+    nrow()
   cr <- (n_rows + 1) / 2
   cc <- (n_cols + 1) / 2
   r_height <- (1 / (compactness + 0.001) - 1) * (n_rows) + 1
@@ -37,9 +43,8 @@ points_normalised <- function(pts, grd, compactness) {
   min_x <- min(pts$x)
   max_x <- max(pts$x)
   return(pts |>
-           mutate(
-             y=rescale(y, to=c(cc-r_height/2, cc+r_height/2), from=c(min_y, max_y)),
-             x=rescale(x, to=c(cc-r_width/2, cc+r_width/2), from=c(min_x, max_x))
-           )
-  )
+    mutate(
+      y = rescale(y, to = c(cc - r_height / 2, cc + r_height / 2), from = c(min_y, max_y)),
+      x = rescale(x, to = c(cc - r_width / 2, cc + r_width / 2), from = c(min_x, max_x))
+    ))
 }

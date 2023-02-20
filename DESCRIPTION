@@ -17,6 +17,8 @@ Imports:
     tibble
 Suggests: 
     ggplot2,
+    knitr,
+    rmarkdown,
     testthat
 Depends: 
     R (>= 3.5.0)
@@ -28,3 +30,4 @@ RoxygenNote: 7.2.3
 LazyData: true
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr
