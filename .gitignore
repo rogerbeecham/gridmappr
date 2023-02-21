@@ -1,8 +1,12 @@
+.project
+.settings
 .Rproj.user
 .Rhistory
 .Rdata
 .httr-oauth
 .DS_Store
 inst/doc
-docs
+gridmappr.Rproj
+vignettes/*_cache/
+README_cache/
 ^README-.*\.png$
