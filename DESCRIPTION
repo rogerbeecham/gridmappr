@@ -19,7 +19,13 @@ Suggests:
     ggplot2,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    forcats,
+    ggtext, 
+    patchwork,
+    readr, 
+    stringr,
+    tidyr
 Depends: 
     R (>= 3.5.0)
 License: GPL (>= 3)

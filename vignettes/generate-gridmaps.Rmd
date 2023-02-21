@@ -76,7 +76,7 @@ solution <- points_to_grid(pts, n_row, n_col, compactness = .6)
 ```
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("img/lb-no-spacers.svg")
+knitr::include_graphics("../man/figures/lb-no-spacers.svg")
 ```
 
 
@@ -101,7 +101,7 @@ solution <- points_to_grid(pts, n_row, n_col, compactness = 1, spacers)
 
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("img/lb-spacers.svg")
+knitr::include_graphics("../man/figures/lb-spacers.svg")
 ```
 
 
@@ -119,7 +119,7 @@ solution <- points_to_grid(pts, n_row, n_col, compactness = .8)
 ```
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("img/us-no-spacers.svg")
+knitr::include_graphics("../man/figures/us-no-spacers.svg")
 ```
 
 Again this can be addressed by judiciously inserting spacers.
@@ -139,7 +139,7 @@ solution <- points_to_grid(pts, n_row, n_col, compactness = .9, spacers)
 ```
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("img/us-spacers.svg")
+knitr::include_graphics("../man/figures/us-spacers.svg")
 ```
 
 
@@ -159,7 +159,7 @@ solution <- points_to_grid(pts, n_row, n_col, compactness = 0)
 ```
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("img/leics.svg")
+knitr::include_graphics("../man/figures/leics.svg")
 ```
 
 

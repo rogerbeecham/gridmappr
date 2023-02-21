@@ -5,7 +5,7 @@
 #' @importFrom dplyr mutate row_number bind_cols
 #' @importFrom tibble tibble as_tibble
 #' @importFrom purrr map2_df
-#' @importFrom sf st_sf st_make_grid st_coordinates st_centroid st_agr
+#' @importFrom sf st_sf st_make_grid st_coordinates st_centroid st_agr<-
 #'
 #' @param sf_file sf object to pass grid over.
 #' @param n_row number of rows in grid.
