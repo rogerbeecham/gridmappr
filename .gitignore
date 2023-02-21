@@ -10,3 +10,4 @@ gridmappr.Rproj
 vignettes/*_cache/
 README_cache/
 ^README-.*\.png$
+docs
