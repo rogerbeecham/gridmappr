@@ -44,6 +44,219 @@ You can install the development version of `gridmappr` from [GitHub](https://git
 devtools::install_github("rogerbeecham/gridmappr")
 ```
 
+``` {r, load_packages, include = FALSE}
+# For reproducing this document.
+library(ggplot2)
+library(ggforce)
+library(tidyr)
+library(dplyr)
+library(purrr)
+library(sf)
+library(patchwork)
+library(stringr)
+library(gridmappr)
+```
+
+
+```{r hidden_options, include=FALSE}
+# misc options
+options(width = 90)
+theme_set(theme_void())
+```
+
+## Example allocations
+
+### London Boroughs
+
+For generating a gridmap layout of 33 London boroughs, we first try an 8x8 regular grid.
+
+* `n_row` Set to 8
+* `n_col` Set to 8
+* `compactness` Set to .6, attempting to preserve the geographic layout with a degree of compactness around the grid centre.
+
+```{r, lb-no-spacers, eval=FALSE}
+n_row <- 8
+n_col <- 8
+pts <- london_boroughs |>
+  st_drop_geometry() |>
+  select(area_name, x = easting, y = northing)
+solution <- points_to_grid(pts, n_row, n_col, .6)
+```
+
+``` {r, lb-no-spacers-plot, eval=FALSE, echo=FALSE}
+gridmap <- make_grid(london_boroughs, n_row, n_col) |>
+  left_join(solution) |>
+  ggplot() +
+  geom_sf(fill = "transparent", colour = "#EEEEEE", linewidth = .6) +
+  geom_text(aes(x = x, y = y, label = str_extract(area_name, "^.{3}")), size = 4, colour = "#451C14")
+realmap <- london_boroughs |>
+  ggplot() +
+  geom_sf(fill = "#F1DDD1", colour = "#ffffff", linewidth = .6) +
+  geom_text(aes(x = easting, y = northing, label = word(area_name, 1)), size = 2, colour = "#451C14")
+realmap + gridmap
+```
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths = c(1.2, 1))
+ggsave(filename = here("man", "figures", "lb-no-spacers.svg"), plot = plot, width = 8, height = 5)
+```
+
+![](./man/figures/lb-no-spacers.svg)
+
+
+`gridmappr` allows for spacers (light grey) to be specified: grid cells that further constrain the distribution by not allowing points to be allocated to them. Adding some targeted spacers, we can get close to the [LondonSquared](https://github.com/aftertheflood/londonsquared) layout.
+
+
+```{r, lb-spacers, eval=FALSE}
+n_row <- 7
+n_col <- 8
+spacers <- list(
+  c(1, 3), c(1, 5), c(1, 6),
+  c(2, 2), c(2, 7),
+  c(3, 1),
+  c(6, 1), c(6, 2), c(6, 7), c(6, 8),
+  c(7, 2), c(7, 3), c(7, 4), c(7, 6), c(7, 7)
+)
+pts <- london_boroughs |>
+  st_drop_geometry() |>
+  select(area_name, x = easting, y = northing)
+solution <- points_to_grid(pts, n_row, n_col, 1, spacers)
+```
+
+``` {r, lb-spacers-plot, eval=FALSE, echo=FALSE}
+gridmap <- make_grid(london_boroughs, n_row, n_col) |>
+  left_join(solution) |>
+  ggplot() +
+  geom_sf(fill = "transparent", colour = "#EEEEEE", linewidth = .6) +
+  geom_sf(
+    data = . %>% inner_join(spacers |> map_df(~ bind_rows(row = .x[1], col = .x[2]))),
+    colour = "#EEEEEE", linewidth = .6, fill = "#FAFAFA",
+  ) +
+  geom_text(aes(x = x, y = y, label = str_extract(area_name, "^.{3}")), size = 4, colour = "#451C14")
+realmap + gridmap
+```
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths = c(1.2, 1))
+ggsave(filename = here("man", "figures", "lb-spacers.svg"), plot = plot, width = 8, height = 5)
+```
+
+![](./man/figures/lb-spacers.svg)
+
+
+### US States
+
+There are other instances where some manual control over the allocation is desirable -- including Alaska, Hawaii and Puerto Rico in the grid of US states for example.
+
+```{r, us-no-spacers, eval=FALSE}
+n_row <- 7
+n_col <- 12
+pts <- us_states |>
+  st_drop_geometry() |>
+  select(STUSPS, x, y)
+solution <- points_to_grid(pts, n_row, n_col, .8)
+```
+
+``` {r, us-no-spacers-plot, eval=FALSE, echo=FALSE}
+gridmap <- make_grid(us_states, n_row, n_col) |>
+  left_join(solution) |>
+  ggplot() +
+  geom_sf(fill = "transparent", colour = "#EEEEEE", linewidth = .6) +
+  geom_text(aes(x = x, y = y, label = STUSPS), size = 4, colour = "#451C14") +
+  theme_void()
+realmap <- us_states |>
+  ggplot() +
+  geom_sf(fill = "#F1DDD1", colour = "#ffffff", linewidth = .4) +
+  geom_text(aes(x = x, y = y, label = STUSPS), size = 2, colour = "#451C14") +
+  theme_void()
+realmap + gridmap
+```
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths = c(1.2, 1))
+ggsave(filename = here("man", "figures", "us-no-spacers.svg"), plot = plot, width = 10, height = 5)
+```
+
+![](./man/figures/us-no-spacers.svg)
+
+Again this can be addressed by judiciously inserting spacers.
+
+```{r, us-spacers, eval=FALSE}
+n_row <- 7
+n_col <- 12
+spacers <- list(
+  c(4, 2), c(4, 3),
+  c(3, 5), c(3, 4), c(3, 3), c(3, 12), c(3, 11),
+  c(2, 4), c(2, 5), c(2, 6), c(2, 7), c(2, 8)
+)
+pts <- us_states |>
+  st_drop_geometry() |>
+  select(STUSPS, x, y)
+solution <- points_to_grid(pts, n_row, n_col, .9, spacers)
+```
+
+``` {r, us-spacers-plot, eval=FALSE, echo=FALSE}
+gridmap <- make_grid(us_states, n_row, n_col) |>
+  left_join(solution) |>
+  ggplot() +
+  geom_sf(fill = "transparent", colour = "#EEEEEE", linewidth = .6) +
+  geom_sf(
+    data = . %>% inner_join(spacers |> map_df(~ bind_rows(row = .x[1], col = .x[2]))),
+    colour = "#EEEEEE", linewidth = .6, fill = "#FAFAFA",
+  ) +
+  geom_text(aes(x = x, y = y, label = STUSPS), size = 4, colour = "#451C14") +
+  theme_void()
+realmap + gridmap
+```
+
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths = c(1.2, 1))
+ggsave(filename = here("man", "figures", "us-spacers.svg"), plot = plot, width = 10, height = 5)
+```
+
+![](./man/figures/us-spacers.svg)
+
+
+### Leicestershire Wards 
+
+Geographies with 'holes' are a particular challenge for grid layouts. By setting the compactness to zero, allocations are pushed to the edge of the grid, preserving the internal space containing the separate City of Leicester.
+
+
+```{r, leics, eval=FALSE}
+n_row <- 14
+n_col <- 14
+pts <- leics_wards |>
+  st_drop_geometry() |>
+  select(ward_name, x = easting, y = northing)
+solution <- points_to_grid(pts, n_row, n_col, 0)
+```
+
+``` {r, leics-plot, eval=FALSE, echo=FALSE}
+gridmap <- make_grid(leics_wards, n_row, n_col) |>
+  left_join(solution) |>
+  ggplot() +
+  geom_sf(fill = "transparent", colour = "#EEEEEE", linewidth = .6) +
+  geom_sf(
+    data = . %>% inner_join(spacers |> map_df(~ bind_rows(row = .x[1], col = .x[2]))),
+    colour = "#EEEEEE", linewidth = .6, fill = "#FAFAFA",
+  ) +
+  geom_text(aes(x = x, y = y, label = str_extract(ward_name, "^.{3}")), size = 4, colour = "#451C14") +
+  theme_void()
+realmap <- leics_wards |>
+  ggplot() +
+  geom_sf(fill = "#F1DDD1", colour = "#ffffff", linewidth = .4) +
+  geom_text(aes(x = easting, y = northing, label = str_extract(ward_name, "^.{3}")), size = 2, colour = "#451C14") +
+  theme_void()
+realmap + gridmap
+```
+
+``` {r, include=FALSE, eval=FALSE}
+plot <- realmap + gridmap + plot_layout(widths = c(1.2, 1))
+ggsave(filename = here("man", "figures", "leics.svg"), plot = plot, width = 12, height = 6)
+```
+![](./man/figures/leics.svg)
+
 ## Example Uses
 
 * [Beecham et al. 2021](https://eprints.whiterose.ac.uk/172944/) 'On the Use of ‘Glyphmaps’ for Analysing the Scale and Temporal Spread of COVID-19 Reported Cases', *ISPRS International Journal of Geo-Information*, 10(4), pp. 213--.
