@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-if (capabilities("cairo") && Sys.info()[['sysname']] != "Darwin") {
+if (capabilities("cairo") && Sys.info()[["sysname"]] != "Darwin") {
   knitr::opts_chunk$set(
     dev = "png",
     dev.args = list(type = "cairo")
@@ -49,7 +49,7 @@ theme_set(theme_void())
 
 ## Generate allocation with `points_to_grid()` 
 
-The main allocation function in `gridmappr` is `points_to_grid()`.  This will return grid cell positions (*row* and *column* identifiers) for a given set of geographic locations. It is paramerised with:
+The main allocation function in `gridmappr` is `points_to_grid()`.  This will return grid cell positions (*row* and *column* identifiers) for a given set of geographic locations. It is parameterised with:
 
 * `pts` A tibble of geographic points (*x*,*y*) to be allocated to a grid.
 * `n_row` Maximum number of *rows* in grid.
@@ -62,8 +62,8 @@ The main allocation function in `gridmappr` is `points_to_grid()`.  This will re
 
 For generating a gridmap layout of 33 London boroughs, we try an 8x8 regular grid.
 
-* `n_row` Set to 8
-* `n_col` Set to 8
+* `n_row` Set to 8.
+* `n_col` Set to 8.
 * `compactness` Set to .6, attempting to preserve the geographic layout with a degree of compactness around the grid centre.
 
 ```{r, lb-no-spacers, eval=FALSE}
@@ -178,52 +178,94 @@ The function takes an [`sf`](https://r-spatial.github.io/sf/index.html) data fra
 * `n_col` Number of columns in grid.
 
 
-### Create layout solution
+### Create layout solution and grid object
 
-First we generate a gridmap layout solution (named `solution`) for London boroughs, including spacers to approximate the LondonSquared layout.
+First we generate a gridmap layout solution (named `solution`) for Leicestershire wards.
 
-```{r, lb-layout-grid}
-n_row <- 7
-n_col <- 8
-spacers <- list(
-  c(1, 3), c(1, 5), c(1, 6),
-  c(2, 2), c(2, 7),
-  c(3, 1),
-  c(6, 1), c(6, 2), c(6, 7), c(6, 8),
-  c(7, 2), c(7, 3), c(7, 4), c(7, 6), c(7, 7)
-)
-pts <- london_boroughs |>
+```{r, lb-layout-grid, eval=FALSE}
+n_row <- 14
+n_col <- 14
+pts <- leics_wards |>
   st_drop_geometry() |>
-  select(area_name, x = easting, y = northing)
-solution <- points_to_grid(pts, n_row, n_col, compactness = 1, spacers)
+  select(ward_name, x = easting, y = northing)
+solution <- points_to_grid(pts, n_row, n_col, 0)
 ```
 
-### Create grid object
+Next, create the gridded polygon object using `make_grid()`. Supply the  `sf` file of Leicestershire polygons (`leics_wards`, comes with `gridmappr`) and the dimensions of the grid, the same as those used to generate the layout solution. 
 
-Next, create the gridded polygon object using `make_grid()`. Supply the  `sf` file of London borough polygons (`london_boroughs`, comes with `gridmappr`) and the dimensions of the grid, the same as those used to generate the layout solution. 
-
-``` {r, lb-grid}
-grid <- make_grid(london_boroughs, n_row, n_col)
+``` {r, lb-grid, eval=FALSE}
+grid <- make_grid(leics_wards, n_row, n_col)
 ```
 
 
 ### Plot grid object using `geom_sf()`
 
-Cells of the grid that have a borough allocated to them can then be isolated by joining the gridded object (`grid`) on the layout `solution`. 
+Cells of the grid that have a ward allocated to them can then be isolated by joining the gridded object (`grid`) on the layout `solution`. 
 
 
 Below we plot the gridded sf object using `ggplot2`'s [`geom_sf`](https://ggplot2.tidyverse.org/reference/ggsf.html) geom. 
 
-``` {r, lb-mapgrid, warning = FALSE}
+``` {r, lb-mapgrid, warning = FALSE, eval=FALSE}
 grid |>
-  left_join(solution) |> mutate(is_alloc=!is.na(area_name)) |> 
+  left_join(solution) |>
+  mutate(is_alloc = !is.na(ward_name)) |>
   ggplot() +
-  geom_sf(aes(fill = is_alloc), colour = "#EEEEEE", linewidth = .6) +
-  geom_text(aes(x = x, y = y, label = str_extract(area_name, "^.{3}")), size = 4, colour = "#451C14") +
-  scale_fill_manual(values = c("#ffffff", "#F1DDD1"), guide = "none")
+  geom_sf(fill = "transparent", colour = "#EEEEEE", linewidth = .6) +
+  geom_text(aes(x = x, y = y, label = str_extract(ward_name, "^.{3}")), size = 4, colour = "#451C14")
+```
+
+```{r out.width = '60%', echo = FALSE}
+knitr::include_graphics("../man/figures/leics-grid.svg")
 ```
 
 
+## Show displacement vectors with `odvis::get_trajectory()`
 
+When evaluating different layout solutions, you may wish to encode explicitly the geographic distortion introduced by grid layouts. In the example, displacement vectors are drawn connecting the centroid of each ward in Leicestershire in *real* and *grid* space. Note that the vectors start straight at the real (origin) geographies and curve towards the grid (destination) geographies. This is achieved with `get_trajectory()` from `odvis`, a package providing helper functions for parameterising flow maps in gglot2. 
 
+First install `odvis`.
+
+``` {r, install_odvis, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("rogerbeecham/odvis")
+```
+
+Next combine the `grid` and `leics_wards` (real geography) objects into a single simple features data frame. 
+
+``` {r, combine_geogs, eval=FALSE}
+leics_geogs <- bind_rows(
+  leics_wards |> mutate(type = "real") |> select(ward_name, x = easting, y = northing, type),
+  gridmap |> left_join(solution) |> mutate(type = "grid") |> select(ward_name, x, y, type, geometry = geom)
+)
+```
+
+Both the origin (real) and destination (grid) locations are contained in the merged `leics_wards` dataset. Control points, which affect the path of the vectors so that they curve towards the destination, are generated using `odvis::get_trajectory()`, which implements the parameterisation published in [Wood et al. 2011](https://openaccess.city.ac.uk/id/eprint/538/). In the code below we `map()` over each real-to-grid location pair calling `get_trajectory()` to generate a data frame of `trajectories` -- origins, destinations and control points.
+
+```{r, get-curve-trajecories, eval=FALSE}
+trajectories <- leics_geogs |>
+  st_drop_geometry() |>
+  filter(!is.na(ward_name)) |>
+  pivot_wider(names_from = type, values_from = c(x, y)) |>
+  mutate(id = row_number()) |>
+  nest(data = c(ward_name, x_real, y_real, x_grid, y_grid)) |>
+  mutate(
+    trajectory = map(data, ~ get_trajectory(.x$x_real, .x$y_real, .x$x_grid, .x$y_grid, .x$ward_name))
+  ) |>
+  select(trajectory) |>
+  unnest(cols = trajectory)
+```
+
+Finally trajectories are plotted with `ggforce::geom_bezier0()`, with separate lines (`group=`) for each real-to-grid OD pair.
+
+```{r, draw_curve_trajecories, eval=FALSE}
+ggplot() +
+  geom_sf(data = leics_geogs |> mutate(type = factor(type, levels = c("real", "grid"))), aes(fill = type, colour = type), linewidth = .3) +
+  ggforce::geom_bezier0(data = trajectories, aes(x = x, y = y, group = od_pair), colour = "#451C14", linewidth = .2) +
+  scale_fill_manual(values = c("#F1DDD1", "transparent"), guide = "none") +
+  scale_colour_manual(values = c("#FFFFFF", "#d9d9d9"), guide = "none")
+```
+
+```{r out.width = '70%', echo = FALSE}
+knitr::include_graphics("../man/figures/leics-displace.svg")
+```
 

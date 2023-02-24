@@ -257,6 +257,40 @@ ggsave(filename = here("man", "figures", "leics.svg"), plot = plot, width = 12, 
 ```
 ![](./man/figures/leics.svg)
 
+
+``` {r, include=FALSE, eval=FALSE}
+devtools::install_github("rogerbeecham/odvis")
+library(odvis)
+
+grid <- make_grid(leics_wards, n_row, n_col) |>
+  left_join(solution)
+
+leics_geogs <- bind_rows(
+  leics_wards |> mutate(type = "real") |> select(ward_name, x = easting, y = northing, type),
+  gridmap |> mutate(type = "grid") |> select(ward_name, x, y, type, geometry = geom)
+)
+
+# Get trajectories grid
+trajectories <- leics_geogs |>
+  st_drop_geometry() |>
+  filter(!is.na(ward_name)) |>
+  pivot_wider(names_from = type, values_from = c(x, y)) |>
+  mutate(id = row_number()) |>
+  nest(data = c(ward_name, x_real, y_real, x_grid, y_grid)) |>
+  mutate(
+    trajectory = map(data, ~ get_trajectory(.x$x_real, .x$y_real, .x$x_grid, .x$y_grid, .x$ward_name))
+  ) |>
+  select(trajectory) |>
+  unnest(cols = trajectory)
+
+ggplot() +
+  geom_sf(data = leics_geogs, aes(fill = type, colour = type), linewidth = .4, alpha = .7) +
+  ggforce::geom_bezier0(data = trajectories, aes(x = x, y = y, group = od_pair), colour = "#451C14", linewidth = .2) +
+  scale_fill_manual(values = c("#FFFFFF", "#F1DDD1"), guide = "none") +
+  scale_colour_manual(values = c("#d9d9d9", "#FFFFFF"), guide = "none")
+```
+
+
 ## Example Uses
 
 * [Beecham et al. 2021](https://eprints.whiterose.ac.uk/172944/) 'On the Use of ‘Glyphmaps’ for Analysing the Scale and Temporal Spread of COVID-19 Reported Cases', *ISPRS International Journal of Geo-Information*, 10(4), pp. 213--.
