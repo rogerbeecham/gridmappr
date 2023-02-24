@@ -73,7 +73,7 @@
                         <h4 data-toc-skip class="author">Roger
 Beecham</h4>
             
-            <h4 data-toc-skip class="date">2023-02-22</h4>
+            <h4 data-toc-skip class="date">2023-02-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rogerbeecham/gridmappr/blob/HEAD/vignettes/generate-gridmaps.Rmd" class="external-link"><code>vignettes/generate-gridmaps.Rmd</code></a></small>
       <div class="d-none name"><code>generate-gridmaps.Rmd</code></div>
@@ -119,7 +119,7 @@ Allocation</a> problem.</p>
 <p>The main allocation function in <code>gridmappr</code> is
 <code><a href="../reference/points_to_grid.html">points_to_grid()</a></code>. This will return grid cell positions
 (<em>row</em> and <em>column</em> identifiers) for a given set of
-geographic locations. It is paramerised with:</p>
+geographic locations. It is parameterised with:</p>
 <ul>
 <li>
 <code>pts</code> A tibble of geographic points
@@ -147,9 +147,9 @@ origin <code>(1,1)</code> in bottom-left. Default is an empty list.</li>
 regular grid.</p>
 <ul>
 <li>
-<code>n_row</code> Set to 8</li>
+<code>n_row</code> Set to 8.</li>
 <li>
-<code>n_col</code> Set to 8</li>
+<code>n_col</code> Set to 8.</li>
 <li>
 <code>compactness</code> Set to .6, attempting to preserve the
 geographic layout with a degree of compactness around the grid
@@ -254,55 +254,97 @@ allocation position.</p>
 <code>n_col</code> Number of columns in grid.</li>
 </ul>
 <div class="section level3">
-<h3 id="create-layout-solution">Create layout solution<a class="anchor" aria-label="anchor" href="#create-layout-solution"></a>
+<h3 id="create-layout-solution-and-grid-object">Create layout solution and grid object<a class="anchor" aria-label="anchor" href="#create-layout-solution-and-grid-object"></a>
 </h3>
 <p>First we generate a gridmap layout solution (named
-<code>solution</code>) for London boroughs, including spacers to
-approximate the LondonSquared layout.</p>
+<code>solution</code>) for Leicestershire wards.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
-<span><span class="va">n_col</span> <span class="op">&lt;-</span> <span class="fl">8</span></span>
-<span><span class="va">spacers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">7</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">8</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">7</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">london_boroughs</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">14</span></span>
+<span><span class="va">n_col</span> <span class="op">&lt;-</span> <span class="fl">14</span></span>
+<span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">leics_wards</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">area_name</span>, x <span class="op">=</span> <span class="va">easting</span>, y <span class="op">=</span> <span class="va">northing</span><span class="op">)</span></span>
-<span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, <span class="va">n_row</span>, <span class="va">n_col</span>, compactness <span class="op">=</span> <span class="fl">1</span>, <span class="va">spacers</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="create-grid-object">Create grid object<a class="anchor" aria-label="anchor" href="#create-grid-object"></a>
-</h3>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ward_name</span>, x <span class="op">=</span> <span class="va">easting</span>, y <span class="op">=</span> <span class="va">northing</span><span class="op">)</span></span>
+<span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, <span class="va">n_row</span>, <span class="va">n_col</span>, <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>Next, create the gridded polygon object using
-<code><a href="../reference/make_grid.html">make_grid()</a></code>. Supply the <code>sf</code> file of London
-borough polygons (<code>london_boroughs</code>, comes with
+<code><a href="../reference/make_grid.html">make_grid()</a></code>. Supply the <code>sf</code> file of
+Leicestershire polygons (<code>leics_wards</code>, comes with
 <code>gridmappr</code>) and the dimensions of the grid, the same as
 those used to generate the layout solution.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_grid.html">make_grid</a></span><span class="op">(</span><span class="va">london_boroughs</span>, <span class="va">n_row</span>, <span class="va">n_col</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_grid.html">make_grid</a></span><span class="op">(</span><span class="va">leics_wards</span>, <span class="va">n_row</span>, <span class="va">n_col</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="plot-grid-object-using-geom_sf">Plot grid object using <code>geom_sf()</code><a class="anchor" aria-label="anchor" href="#plot-grid-object-using-geom_sf"></a>
 </h3>
-<p>Cells of the grid that have a borough allocated to them can then be
+<p>Cells of the grid that have a ward allocated to them can then be
 isolated by joining the gridded object (<code>grid</code>) on the layout
 <code>solution</code>.</p>
 <p>Below we plot the gridded sf object using <code>ggplot2</code>’s <a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link"><code>geom_sf</code></a>
 geom.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grid</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>is_alloc<span class="op">=</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">area_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>is_alloc <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">ward_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">is_alloc</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"#EEEEEE"</span>, linewidth <span class="op">=</span> <span class="fl">.6</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">area_name</span>, <span class="st">"^.{3}"</span><span class="op">)</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">4</span>, colour <span class="op">=</span> <span class="st">"#451C14"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#ffffff"</span>, <span class="st">"#F1DDD1"</span><span class="op">)</span>, guide <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Joining with `by = join_by(col, row)`</span></span></code></pre></div>
-<p><img src="generate-gridmaps_files/figure-html/lb-mapgrid-1.png" width="700"></p>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"transparent"</span>, colour <span class="op">=</span> <span class="st">"#EEEEEE"</span>, linewidth <span class="op">=</span> <span class="fl">.6</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">ward_name</span>, <span class="st">"^.{3}"</span><span class="op">)</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">4</span>, colour <span class="op">=</span> <span class="st">"#451C14"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/leics-grid.svg" width="60%"></p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="show-displacement-vectors-with-odvisget_trajectory">Show displacement vectors with
+<code>odvis::get_trajectory()</code><a class="anchor" aria-label="anchor" href="#show-displacement-vectors-with-odvisget_trajectory"></a>
+</h2>
+<p>When evaluating different layout solutions, you may wish to encode
+explicitly the geographic distortion introduced by grid layouts. In the
+example, displacement vectors are drawn connecting the centroid of each
+ward in Leicestershire in <em>real</em> and <em>grid</em> space. Note
+that the vectors start straight at the real (origin) geographies and
+curve towards the grid (destination) geographies. This is achieved with
+<code>get_trajectory()</code> from <code>odvis</code>, a package
+providing helper functions for parameterising flow maps in gglot2.</p>
+<p>First install <code>odvis</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"rogerbeecham/odvis"</span><span class="op">)</span></span></code></pre></div>
+<p>Next combine the <code>grid</code> and <code>leics_wards</code> (real
+geography) objects into a single simple features data frame.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">leics_geogs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
+<span>  <span class="va">leics_wards</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"real"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ward_name</span>, x <span class="op">=</span> <span class="va">easting</span>, y <span class="op">=</span> <span class="va">northing</span>, <span class="va">type</span><span class="op">)</span>,</span>
+<span>  <span class="va">gridmap</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"grid"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ward_name</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, geometry <span class="op">=</span> <span class="va">geom</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Both the origin (real) and destination (grid) locations are contained
+in the merged <code>leics_wards</code> dataset. Control points, which
+affect the path of the vectors so that they curve towards the
+destination, are generated using <code>odvis::get_trajectory()</code>,
+which implements the parameterisation published in <a href="https://openaccess.city.ac.uk/id/eprint/538/" class="external-link">Wood et
+al. 2011</a>. In the code below we <code>map()</code> over each
+real-to-grid location pair calling <code>get_trajectory()</code> to
+generate a data frame of <code>trajectories</code> – origins,
+destinations and control points.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trajectories</span> <span class="op">&lt;-</span> <span class="va">leics_geogs</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">ward_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">pivot_wider</span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">type</span>, values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">nest</span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ward_name</span>, <span class="va">x_real</span>, <span class="va">y_real</span>, <span class="va">x_grid</span>, <span class="va">y_grid</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    trajectory <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">data</span>, <span class="op">~</span> <span class="fu">get_trajectory</span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">x_real</span>, <span class="va">.x</span><span class="op">$</span><span class="va">y_real</span>, <span class="va">.x</span><span class="op">$</span><span class="va">x_grid</span>, <span class="va">.x</span><span class="op">$</span><span class="va">y_grid</span>, <span class="va">.x</span><span class="op">$</span><span class="va">ward_name</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trajectory</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="va">trajectory</span><span class="op">)</span></span></code></pre></div>
+<p>Finally trajectories are plotted with
+<code>ggforce::geom_bezier0()</code>, with separate lines
+(<code>group=</code>) for each real-to-grid OD pair.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">leics_geogs</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">type</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"real"</span>, <span class="st">"grid"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggforce</span><span class="fu">::</span><span class="fu">geom_bezier0</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trajectories</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, group <span class="op">=</span> <span class="va">od_pair</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"#451C14"</span>, linewidth <span class="op">=</span> <span class="fl">.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#F1DDD1"</span>, <span class="st">"transparent"</span><span class="op">)</span>, guide <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#FFFFFF"</span>, <span class="st">"#d9d9d9"</span><span class="op">)</span>, guide <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/leics-displace.svg" width="70%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
