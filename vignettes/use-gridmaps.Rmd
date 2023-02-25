@@ -101,7 +101,7 @@ pts <- london_boroughs |>
   select(area_name, x = easting, y = northing)
 solution <- points_to_grid(pts, n_row, n_col, compactness = 1, spacers)
 
-gridmap <- make_grid(london_boroughs, n_row, n_col) |>
+grid <- make_grid(london_boroughs, n_row, n_col) |>
   inner_join(solution)
 ```
 
@@ -115,7 +115,7 @@ knitr::include_graphics("../man/figures/lb-commutes.svg")
 ```
 
 ```{r, include=FALSE, eval=FALSE}
-map_bubble <- gridmap |>
+map_bubble <- grid |>
   inner_join(bind_rows(jobs, workers), by = c("area_name" = "bor")) |>
   group_by(area_name, is_prof, type) |>
   summarise(count = sum(count), x = first(x), y = first(y)) |>
@@ -134,8 +134,15 @@ map_bubble <- gridmap |>
   scale_size(range = c(0, 10)) +
   scale_fill_manual(values = c("#4d004b", "#00441b"), guide = "none") +
   scale_colour_manual(values = c("#4d004b", "#00441b"), guide = "none") +
+  guides(size="none") +
   scale_alpha(limits = c(min(jobs$count), max(jobs$count)), guide = "none") +
-  theme(legend.position = "bottom", legend.text = element_text(size=8), legend.title = element_text(size=9))
+  theme(
+    strip.text.y=element_text(angle=90),
+    legend.position = "bottom", 
+    legend.text = element_text(size=8), 
+    legend.title = element_text(size=9),
+    plot.background = element_rect(size=.2)
+    )
 
 map <- gridmap |>
   ggplot() +
@@ -457,6 +464,39 @@ plot <- plot_data |>
     plot.title = element_text(hjust = .5, margin = margin(1, 1, 2, 1), size=14),
     legend.position = "bottom", legend.margin = margin(5, 0, 0, 0),
     legend.key.size = unit(.6, "cm")
+  )
+
+
+od_map <- plot_data |>
+  ggplot() +
+  geom_tile(data = . %>% filter(bor_focus), aes(x = bbox_grid$xmin + .5 * width, y = bbox_grid$ymin + .5 * height), height = height * 1.02, width = width * 1.02, linewidth = 0, fill = "#EEEEEE") +
+  geom_sf(aes(fill = resid), colour = "#616161", size = 0.15, alpha = 0.9) +
+  geom_sf(data = . %>% filter(bor_focus), fill = "transparent", colour = "#373737", size = 0.3) +
+  geom_text(
+    data = plot_data %>% filter(bor_focus),
+    aes(x = o_x, y = o_y, label = str_extract(o_bor, "^.{1}")),
+    colour = "#252525", alpha = 0.9, size = 2.1,
+    hjust = "centre", vjust = "middle"
+  ) +
+  geom_text(
+    data = plot_data %>% filter(bor_focus),
+    aes(x = bbox_grid$xmax, y = bbox_grid$ymin, label = str_extract(o_bor, "^.{3}")),
+    colour = "#252525", alpha = 0.6, size = 3.5,
+    hjust = "right", vjust = "bottom"
+  ) +
+  coord_sf(crs = st_crs(plot_data), datum = NA) +
+  # guides(fill=FALSE)+
+  facet_grid(-d_row ~ d_col, shrink = FALSE) +
+  scale_fill_distiller(palette = "PRGn", direction = -1, breaks = c(-range_resid, 0, range_resid), labels = c("non-prof", "avg", "prof"), limits = c(-range_resid, range_resid), guide="none") +
+  labs(fill = "") +
+  theme(
+    panel.spacing = unit(-0.2, "lines"),
+    strip.text.x = element_blank(), strip.text.y = element_blank(),
+    # plot.subtitle = element_markdown(hjust = .5, margin = margin(1, 1, 10, 1), size=11), 
+    # plot.title = element_text(hjust = .5, margin = margin(1, 1, 2, 1), size=14),
+    legend.position = "bottom", legend.margin = margin(5, 0, 0, 0),
+    legend.key.size = unit(.6, "cm"),
+    plot.background = element_rect(size=.2)
   )
 
 ggsave(filename = "./man/figures/lb-commutes-odmap.svg", plot = plot, width = 8.5, height = 7)

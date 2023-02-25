@@ -17,6 +17,8 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
+![Example gridmaps](man/figures/teaser.svg)
+
 `gridmappr` is an R package that automates the process of generating [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a set of geographic point locations, it creates a grid (with stated *row, column* dimensions) and places each point in a grid cell such that the distance between points in geographic space and that within the grid space is minimised. The package is an R implementation of Jo Wood's Observable notebooks on [Linear Programming](https://observablehq.com/@jwolondon/hello-linear-programming) solvers and their application to the [Gridmap Allocation](https://observablehq.com/@jwolondon/gridmap-allocation?collection=@jwolondon/utilities) problem.
 
 ## Gridmap allocation using compactness with `points_to_grid()` 
@@ -127,17 +129,77 @@ solution <- points_to_grid(pts, n_row, n_col, 1, spacers)
 gridmap <- make_grid(london_boroughs, n_row, n_col) |>
   left_join(solution) |>
   ggplot() +
-  geom_sf(fill = "transparent", colour = "#EEEEEE", linewidth = .6) +
+  # geom_sf(data = lon_geogs |> filter(type=="real"), fill="#F1DDD1", colour="#FFFFFF", linewidth = .3) +
+  geom_sf(fill = "transparent", colour = "#bdbdbd", linewidth = .2) +
   geom_sf(
     data = . %>% inner_join(spacers |> map_df(~ bind_rows(row = .x[1], col = .x[2]))),
-    colour = "#EEEEEE", linewidth = .6, fill = "#FAFAFA",
+    colour = "#EEEEEE", linewidth = 0, fill = "#bdbdbd", alpha=.2,
   ) +
-  geom_text(aes(x = x, y = y, label = str_extract(area_name, "^.{3}")), size = 4, colour = "#451C14")
-realmap + gridmap
+  geom_sf(data = . %>% summarise(), fill = "transparent", colour = "#ffffff", linewidth = .4) +
+  geom_text(aes(x = x, y = y, label = str_extract(area_name, "^.{3}")), size = 3.5, colour = "#451C14", alpha=.9, hjust=.5) #+
+  theme(plot.background = element_rect(size=.2))
+
+
+gridmap_comb <- make_grid(london_boroughs, n_row, n_col) |>
+  left_join(solution) |>
+  ggplot() +
+  geom_sf(data = lon_geogs |> filter(type=="real"), fill="#EEEEEE", colour="#FFFFFF", linewidth = .3) +
+  geom_sf(fill = "transparent", colour = "#bdbdbd", linewidth = .1) +
+  # geom_sf(
+  #   data = . %>% inner_join(spacers |> map_df(~ bind_rows(row = .x[1], col = .x[2]))),
+  #   colour = "#EEEEEE", linewidth = 0, fill = "#bdbdbd", alpha=.2,
+  # ) +
+    geom_sf(data = . %>% summarise(), fill = "transparent", colour = "#ffffff", linewidth = .4) +
+   geom_sf(data = . %>% filter(!is.na(area_name)), fill = "transparent", colour = "#bdbdbd", linewidth = .4) +
+    ggforce::geom_bezier0(data = trajectories, aes(x = x, y = y, group = bor_name), colour = "#451C14", linewidth = .4, alpha=.5) +
+  geom_text(aes(x = x+3000, y = y-1500, label = str_extract(area_name, "^.{3}")), size = 3.5, colour = "#451C14", alpha=.9, hjust=1)
+
+  
+lon_geogs <- bind_rows(
+  london_boroughs |> mutate(type = "real") |> select(area_name, x = easting, y = northing, type),
+  grid |> left_join(solution) |> mutate(type = "grid") |> select(area_name, x, y, type, geometry = geom)
+)
+
+trajectories <- lon_geogs |>
+  st_drop_geometry() |>
+  filter(!is.na(area_name)) |>
+  pivot_wider(names_from = type, values_from = c(x, y)) |>
+  mutate(bor_name = area_name) |>
+  nest(data = c(area_name, x_real, y_real, x_grid, y_grid)) |>
+  mutate(
+    trajectory = map(data, ~ get_trajectory(.x$x_real, .x$y_real, .x$x_grid, .x$y_grid, .x$ward_name))
+  ) |>
+  select(trajectory, bor_name) |>
+  unnest(cols = trajectory)
+
+displacement <- ggplot() +
+  geom_sf(data = lon_geogs |> mutate(type = factor(type, levels = c("real", "grid"))), aes(fill = type, colour = type), linewidth = .3) +
+  ggforce::geom_bezier0(data = trajectories, aes(x = x, y = y, group = bor_name), colour = "#451C14", linewidth = .2) +
+  scale_fill_manual(values = c("#F1DDD1", "transparent"), guide = "none") +
+  scale_colour_manual(values = c("#FFFFFF", "#d9d9d9"), guide = "none")
+
+plot <- gridmap + map_bubble + od_map + plot_layout(widths = c(.6,.7,1))
+
+layout <- "
+AADDD
+AADDD
+AADDD
+BBDDD
+BBEEE
+BBEEE
+CCEEE
+CCEEE
+CCEEE
+"
+plot <- realmap + gridmap + gridmap_comb + map_bubble + od_map + plot_layout(design=layout) & theme(plot.background = element_rect(size=.1))
+
+plot <- (realmap / gridmap / gridmap_comb) | (map_bubble / od_map) + plot_layout(widths = c(.1,1)) & theme(plot.background = element_rect(size=.1))
+
+ggsave(filename = here("man", "figures", "teaser.svg"), plot = plot, width = 12, height = 9)
 ```
 
 ``` {r, include=FALSE, eval=FALSE}
-plot <- realmap + gridmap + plot_layout(widths = c(1.2, 1))
+plot <- realmap + gridmap + plot_layout(widths = c(1, 1))
 ggsave(filename = here("man", "figures", "lb-spacers.svg"), plot = plot, width = 8, height = 5)
 ```
 
