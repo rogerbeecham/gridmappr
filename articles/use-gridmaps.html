@@ -73,7 +73,7 @@
                         <h4 data-toc-skip class="author">Roger
 Beecham</h4>
             
-            <h4 data-toc-skip class="date">2023-02-24</h4>
+            <h4 data-toc-skip class="date">2023-02-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rogerbeecham/gridmappr/blob/HEAD/vignettes/use-gridmaps.Rmd" class="external-link"><code>vignettes/use-gridmaps.Rmd</code></a></small>
       <div class="d-none name"><code>use-gridmaps.Rmd</code></div>
@@ -188,7 +188,7 @@ explanation of <code><a href="../reference/points_to_grid.html">points_to_grid()
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">area_name</span>, x <span class="op">=</span> <span class="va">easting</span>, y <span class="op">=</span> <span class="va">northing</span><span class="op">)</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, <span class="va">n_row</span>, <span class="va">n_col</span>, compactness <span class="op">=</span> <span class="fl">1</span>, <span class="va">spacers</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">gridmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_grid.html">make_grid</a></span><span class="op">(</span><span class="va">london_boroughs</span>, <span class="va">n_row</span>, <span class="va">n_col</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_grid.html">make_grid</a></span><span class="op">(</span><span class="va">london_boroughs</span>, <span class="va">n_row</span>, <span class="va">n_col</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
