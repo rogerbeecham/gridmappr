@@ -211,7 +211,7 @@ proportional symbols, with <code><a href="https://ggplot2.tidyverse.org/referenc
 variables: occupation type (collapsed to <em>professional</em> or
 <em>non-professional</em>) and whether <em>jobs</em> or <em>workers</em>
 in the borough are counted over.</p>
-<p><img src="../../figures-source/lb-commutes.svg" width="100%"></p>
+<p><img src="../../reference/figures/lb-commutes.svg" width="100%"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gridmap</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">jobs</span>, <span class="va">workers</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"area_name"</span> <span class="op">=</span> <span class="st">"bor"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -266,7 +266,7 @@ summarising the number of <em>workers</em> (left-pointing bars) and
 <em>jobs</em> (right-pointing bars) by occupation type, the full nine
 standard classes are shown, in each borough with a gridmap
 arrangement.</p>
-<p><img src="../../figures-source/lb-commutes-occ.svg" width="100%"></p>
+<p><img src="../../reference/figures/lb-commutes-occ.svg" width="100%"></p>
 <!-- An advantage of gridmap layouts is that they free-up graphic space, thereby enabling potentially detailed charts to be shown with geographic context (e.g. [Beecham et al. 2021](https://www.mdpi.com/2220-9964/10/4/213)).  -->
 <p>This time we create a staged dataset for plotting
 (<code>plot_data</code>). In the graphic above, jobs and workers are
@@ -363,7 +363,7 @@ further geographical arrangement (using <code><a href="https://ggplot2.tidyverse
 allows the creation of <a href="https://www.gicentre.net/featuredpapers#/woodvisualisation2010/" class="external-link">OD
 Maps</a>. With this map-within-map layout, we can look at flows of
 commuters <em>between</em> London boroughs.</p>
-<p><img src="../../figures-source/lb-commutes-odmap.svg" width="100%"></p>
+<p><img src="../../reference/figures/lb-commutes-odmap.svg" width="100%"></p>
 <p>Again we create a staged dataset (<code>plot_data</code>). Counts of
 commuter flows by occupation type (<em>professional</em> and
 <em>non-professional</em>) are calculated along with the proportion of
