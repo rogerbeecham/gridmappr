@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-![Example gridmaps](man/figures/teaser.svg)
+![](figures-source/teaser.svg)
 
 `gridmappr` is an R package that automates the process of generating [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a set of geographic point locations, it creates a grid (with stated *row, column* dimensions) and places each point in a grid cell such that the distance between points in geographic space and that within the grid space is minimised. The package is an R implementation of Jo Wood's Observable notebooks on [Linear Programming](https://observablehq.com/@jwolondon/hello-linear-programming) solvers and their application to the [Gridmap Allocation](https://observablehq.com/@jwolondon/gridmap-allocation?collection=@jwolondon/utilities) problem.
 
@@ -324,7 +324,7 @@ ggsave(filename = here("man", "figures", "leics.svg"), plot = plot, width = 12, 
 devtools::install_github("rogerbeecham/odvis")
 library(odvis)
 
-grid <- make_grid(leics_wards, n_row, n_col) |>
+gridmap <- make_grid(leics_wards, n_row, n_col) |>
   left_join(solution)
 
 leics_geogs <- bind_rows(
@@ -345,11 +345,14 @@ trajectories <- leics_geogs |>
   select(trajectory) |>
   unnest(cols = trajectory)
 
-ggplot() +
+plot <- ggplot() +
   geom_sf(data = leics_geogs, aes(fill = type, colour = type), linewidth = .4, alpha = .7) +
   ggforce::geom_bezier0(data = trajectories, aes(x = x, y = y, group = od_pair), colour = "#451C14", linewidth = .2) +
   scale_fill_manual(values = c("#FFFFFF", "#F1DDD1"), guide = "none") +
-  scale_colour_manual(values = c("#d9d9d9", "#FFFFFF"), guide = "none")
+  scale_colour_manual(values = c("#d9d9d9", "#FFFFFF"), guide = "none") +
+  theme_void()
+
+ggsave(filename = here("man", "figures", "leics-displace.svg"), plot = plot, width = 8.5, height = 8.5)
 ```
 
 

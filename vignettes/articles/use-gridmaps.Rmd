@@ -2,17 +2,8 @@
 title: "Using gridmap layouts"
 author: "Roger Beecham"
 date: "`r Sys.Date()`"
-output: 
-   rmarkdown::html_vignette:
-     toc: true 
-     df_print: kable
-resource_files:
-  - '../man/figures/lb-commutes.png'
-vignette: >
-  %\VignetteIndexEntry{Using gridmap layouts}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   fig.width = 8,
@@ -22,10 +13,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 ## Introduction
 
-This vignette reproduces ideas discussed in [Beecham and Slingsby 2019](https://journals.sagepub.com/doi/10.1177/0308518X19850580), using ggplot2 to create gridmaps analysing the geography of travel-to-work between London boroughs. Gridmaps are encoded in the same way as thematic maps (using `geom_sf()`); as more information-rich data graphics, using ggplot2's layered `geoms` and `facet_grid(row~col)` to effect the gridmap arrangement; and as gridmap-arranged thematic maps (using `facet_grid(row~col)` and `geom_sf()`) to create [OD Maps](https://www.gicentre.net/featuredpapers#/woodvisualisation2010/). 
+This article reproduces ideas discussed in [Beecham and Slingsby 2019](https://journals.sagepub.com/doi/10.1177/0308518X19850580), using ggplot2 to create gridmaps analysing the geography of travel-to-work between London boroughs. Gridmaps are encoded in the same way as thematic maps (using `geom_sf()`); as more information-rich data graphics, using ggplot2's layered `geoms` and `facet_grid(row~col)` to effect the gridmap arrangement; and as gridmap-arranged thematic maps (using `facet_grid(row~col)` and `geom_sf()`) to create [OD Maps](https://www.gicentre.net/featuredpapers#/woodvisualisation2010/). 
 
 ## Setup
 
@@ -111,7 +101,7 @@ grid <- make_grid(london_boroughs, n_row, n_col) |>
 Since we have created a simple features object for the layout with `make_grid()`, it is straightforward to generate thematic gridmaps using [`geom_sf()`](https://ggplot2.tidyverse.org/reference/ggsf.html) alongside ggplot2's standard `geom` layers and grammar. In the map below we encode counts of jobs and workers by borough as proportional symbols, with `geom_point()`, and `facet_grid()` the plot according to two categorical variables: occupation type (collapsed to *professional* or *non-professional*) and whether *jobs* or *workers* in the borough are counted over. 
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("../man/figures/lb-commutes.svg")
+knitr::include_graphics("../../figures-source/lb-commutes.svg")
 ```
 
 ```{r, include=FALSE, eval=FALSE}
@@ -197,7 +187,7 @@ A quick explanation of the ggplot2 spec:
 With standard ggplot2, we can incorporate more detailed graphics into a geographic arrangement. In the example below are bar charts summarising the number of *workers* (left-pointing bars) and *jobs* (right-pointing bars) by occupation type, the full nine standard classes are shown, in each borough with a gridmap arrangement.
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("../man/figures/lb-commutes-occ.svg")
+knitr::include_graphics("../../figures-source/lb-commutes-occ.svg")
 ```
 
 ```{r plot-geoms, include=FALSE, eval=FALSE}
@@ -504,7 +494,7 @@ ggsave(filename = "./man/figures/lb-commutes-odmap.svg", plot = plot, width = 8.
 
 
 ```{r out.width = '100%', echo = FALSE}
-knitr::include_graphics("../man/figures/lb-commutes-odmap.svg")
+knitr::include_graphics("../../figures-source/lb-commutes-odmap.svg")
 ```
 
 Again we create a staged dataset (`plot_data`). Counts of commuter flows by occupation type (*professional* and *non-professional*) are calculated along with the proportion of jobs that are professional (51%, `global_prop`). If we were to randomly sample an OD (borough-borough) commute pair, we might expect this proportion to appear when counting up the number of *professional* and *non-professional* occupation types present in that commute. For each origin-destination pair (OD), we generate expected counts by multiplying the total number of commutes present in an OD pair by this `global_prop`, and from here signed residuals (`resid`) identifying whether there are greater or fewer professionals commuting that OD pair than would be expected. Note that these are like [signed chi-scores](https://www.tandfonline.com/doi/epdf/10.1179/caj.1981.18.1.32?needAccess=true) in that rather than expressing differences in observed counts as a straight proportion of expected counts (dividing by expected counts), we apply a power transform to the denominator. This has the effect of also giving saliency to differences that are large in absolute terms. You could try varying this exponent (maybe between 0.5-1.5) to see its effect on residuals encoded in the OD Maps.

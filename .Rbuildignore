@@ -6,3 +6,5 @@
 ^docs$
 ^pkgdown$
 ^README.Rmd
+^vignettes/articles$
+^figures-source$
