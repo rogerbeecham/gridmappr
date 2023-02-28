@@ -6,7 +6,7 @@
 [![R-CMD-check](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-![Example gridmaps](man/figures/teaser.svg)
+![](man/figures/teaser.svg)
 
 `gridmappr` is an R package that automates the process of generating
 [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a
