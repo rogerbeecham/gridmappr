@@ -1,5 +1,5 @@
 
-# gridmappr
+# gridmappr <a href="https://www.roger-beecham.com/gridmappr/"><img src="man/figures/logo.svg" align="right" height="139" /></a>
 
 <!-- badges: start -->
 
