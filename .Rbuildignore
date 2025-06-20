@@ -8,3 +8,5 @@
 ^README.Rmd
 ^vignettes/articles$
 ^figures-source$
+^doc$
+^Meta$

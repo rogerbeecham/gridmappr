@@ -11,11 +11,14 @@
 #' @param n_col maximum number of columns defining grid. There must be at least as many grid cells as there are points to allocate.
 #' @param n_row maximum number of rows defining grid. There must be at least as many grid cells as there are points to allocate.
 #' @param spacers Optional list of grid cell locations defining grid location of fixed spacers which cannot be allocated points. Coordinates are in (row, column) order with origin top-left. Default is an empty array.
-#
 #' @return A tibble of grid coordinates in the same order as the original array of input points.
+#' @author Roger Beecham
+#' @examples
+#'
+#' grid <- grid_locations(n_row = 8, n_col = 8, spacers = list())
+#' grid
 #'
 #' @export
-#' @examples grid_locations(n_row = 3, n_col = 3, spacers = list())
 grid_locations <- function(n_row, n_col, spacers = list()) {
   grd <- list()
   for (row in 1:n_row) {

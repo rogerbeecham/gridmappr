@@ -11,3 +11,5 @@ vignettes/*_cache/
 README_cache/
 ^README-.*\.png$
 docs/
+/doc/
+/Meta/

@@ -20,7 +20,12 @@ An sf object with variables identifying col and row IDs (bottom left origin), ge
 Constructs a 2D grid of a given number of rows and columns over an sf object.
 }
 \examples{
-library(gridmappr)
-library(sf)
+
+library(ggplot2)
 grid <- make_grid(london_boroughs, 8, 8)
+grid |> ggplot() + geom_sf()
+
+}
+\author{
+Roger Beecham
 }

@@ -11,12 +11,14 @@
 #' @param n_row number of rows in grid.
 #' @param n_col number of columns in grid.
 #' @return An sf object with variables identifying col and row IDs (bottom left origin), geographic centroid of grid square.
+#' @author Roger Beecham
+#' @examples
+#'
+#' library(ggplot2)
+#' grid <- make_grid(london_boroughs, 8, 8)
+#' grid |> ggplot() + geom_sf()
 #'
 #' @export
-#' @examples
-#' library(gridmappr)
-#' library(sf)
-#' grid <- make_grid(london_boroughs, 8, 8)
 make_grid <- function(sf_file, n_row, n_col) {
   grid_sf <- st_sf(
     geom = st_make_grid(sf_file |> mutate(id = row_number()),

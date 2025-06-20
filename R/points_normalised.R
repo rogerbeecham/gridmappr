@@ -9,22 +9,18 @@
 #' @param pts tibble of geographic points (x,y) to be transformed for allocation to grid.
 #' @param grd tibble defining grid positions.
 #' @param compactness Optional parameter between 0 and 1 where 0 allocates towards edges, 0.5 preserves scaled geographic location and 1 allocates towards centre of grid. Default is 1 (compact cluster).
-#
 #' @return A tibble of transformed grid coordinates
+#' @author Roger Beecham
+#' @examples
+#'
+#' library(tibble)
+#' library(sf)
+#' library(dplyr)
+#' pts <- london_boroughs |> st_drop_geometry() |> select(area_name, x = easting, y = northing)
+#' grd <- grid_locations(n_row = 8, n_col = 8, spacers = list())
+#' points_normalised(pts, grd, .6)
 #'
 #' @export
-#' @examples
-#' library(tibble)
-#' pts <- tribble(
-#'   ~x, ~y,
-#'   2, 4,
-#'   1, 5,
-#'   2, 1,
-#'   3, 3,
-#'   3, 4
-#' )
-#' grd <- grid_locations(n_row = 3, n_col = 3, spacers = list())
-#' points_normalised(pts, grd, .6)
 points_normalised <- function(pts, grd, compactness) {
   # Scale to rectangle centred at middle of gird.
   # Size of grid inversely proportional to compactness

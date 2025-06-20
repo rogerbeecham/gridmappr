@@ -1,6 +1,6 @@
 Package: gridmappr
 Title: Gridmap Allocations with Approximate Spatial Arrangements 
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Roger", "Beecham", , "r.j.beecham@leeds.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8563-7251"))
@@ -25,14 +25,17 @@ Suggests:
     patchwork,
     readr, 
     stringr,
-    tidyr
+    tidyr,
+    geofacet,
+    geosphere,
+    here
 Depends: 
     R (>= 4.1.0)
 License: GPL (>= 3)
 Language: en-UK
 BugReports: https://github.com/rogerbeecham/gridmappr/issues
 URL: https://github.com/rogerbeecham/gridmappr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 LazyData: true
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

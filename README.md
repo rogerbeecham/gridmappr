@@ -73,62 +73,90 @@ devtools::install_github("rogerbeecham/gridmappr")
 
 ## Example allocations
 
-### London Boroughs
+### French Départements
 
-For generating a gridmap layout of 33 London boroughs, we first try an
-8x8 regular grid.
+For generating a gridmap layout of France’s 96 départements, first try
+some candidate grid configurations. Remembering that any grid must
+contain at least as many cells as spatial units, grids with 10x10, 12x12
+and 14x14 are trialed:
 
-- `n_row` Set to 8
-- `n_col` Set to 8
+- `n_row` Set to 10, 12, 14
+- `n_col` Set to 10, 12, 14
 - `compactness` Set to .6, attempting to preserve the geographic layout
   with a degree of compactness around the grid centre.
 
+Notice that the smaller the grid dimensions, the more graphic space we
+have for encoding data, at the expense of spatial precision; the larger
+the grid dimensions, the closer that layout approximates to real
+geography, at the expense of graphical space.
+
 ``` r
-n_row <- 8
-n_col <- 8
-pts <- london_boroughs |>
-  st_drop_geometry() |>
-  select(area_name, x = easting, y = northing)
-solution <- points_to_grid(pts, n_row, n_col, .6)
+# Create df of point locations.
+pts <- france_deps |> st_drop_geometry() |>
+  select(area_name = name, x, y)
+
+# Create gridmap layout,.
+solution <- points_to_grid(pts, n_row=10, n_col=10, compactness = .6)
 ```
 
-![](./man/figures/lb-no-spacers.svg)
+![](./man/figures/france-10.svg)
 
-`gridmappr` allows for spacers (light grey) to be specified: grid cells
+``` r
+# Create df of point locations.
+pts <- france_deps |> st_drop_geometry() |>
+  select(area_name = name, x, y)
+
+# Create gridmap layout,.
+solution <- points_to_grid(pts, n_row=12, n_col=12, compactness = .6)
+```
+
+![](./man/figures/france-12.svg)
+
+``` r
+# Create df of point locations.
+pts <- france_deps |> st_drop_geometry() |>
+  select(area_name = name, x, y)
+
+# Create gridmap layout,.
+solution <- points_to_grid(pts, n_row=14, n_col=14, compactness = .6)
+```
+
+![](./man/figures/france-14.svg)
+
+After some exploration, a 13x12 grid, seems to provide a reasonable
+balance between graphic space and geographic context (shape and
+adjacency). However, that layout implies that Corsica is contiguous with
+mainland France. At this point, it is worth adding spacers – grid cells
 that further constrain the distribution by not allowing points to be
-allocated to them. Adding some targeted spacers, we can get close to the
-[LondonSquared](https://github.com/aftertheflood/londonsquared) layout.
+allocated to them. Spacers are defined as a list in `(row, column)`
+order with the origin `(1,1)` in bottom-left. To ensure Corsica is
+separated from mainland France, the first three rows from the 11th
+column and first two from the 10th column are excluded.
 
 ``` r
-n_row <- 7
-n_col <- 8
 spacers <- list(
-  c(1, 3), c(1, 5), c(1, 6),
-  c(2, 2), c(2, 7),
-  c(3, 1),
-  c(6, 1), c(6, 2), c(6, 7), c(6, 8),
-  c(7, 2), c(7, 3), c(7, 4), c(7, 6), c(7, 7)
+  c(1, 11), c(2, 11), c(3, 11), c(2,10), c(1,10)
 )
-pts <- london_boroughs |>
+pts <- france_deps |>
   st_drop_geometry() |>
-  select(area_name, x = easting, y = northing)
-solution <- points_to_grid(pts, n_row, n_col, 1, spacers)
+  select(area_name = name, x = x, y = y)
+solution <- points_to_grid(pts, 13, 12, .6, spacers)
 ```
 
-![](./man/figures/lb-spacers.svg)
+![](./man/figures/france-spacers.svg)
 
 ### US States
 
-There are other instances where some manual control over the allocation
-is desirable – including Alaska, Hawaii and Puerto Rico in the grid of
-US states for example.
+There are of course other well-known geographies, where some manual
+control over the allocation is desirable. In a gridmap of the US, for
+example, separating Alaska, Hawaii and Puerto Rico.
 
 ``` r
 n_row <- 7
 n_col <- 12
 pts <- us_states |>
   st_drop_geometry() |>
-  select(STUSPS, x, y)
+  select(area_name = STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .8)
 ```
 
@@ -142,11 +170,12 @@ n_col <- 12
 spacers <- list(
   c(4, 2), c(4, 3),
   c(3, 5), c(3, 4), c(3, 3), c(3, 12), c(3, 11),
-  c(2, 4), c(2, 5), c(2, 6), c(2, 7), c(2, 8)
+  c(2, 4), c(2, 5), c(2, 6), c(2, 7), c(2, 8),
+  c(1, 6)
 )
 pts <- us_states |>
   st_drop_geometry() |>
-  select(STUSPS, x, y)
+  select(area_name = STUSPS, x, y)
 solution <- points_to_grid(pts, n_row, n_col, .9, spacers)
 ```
 
@@ -154,17 +183,17 @@ solution <- points_to_grid(pts, n_row, n_col, .9, spacers)
 
 ### Leicestershire Wards
 
-Geographies with ‘holes’ are a particular challenge for grid layouts. By
-setting the compactness to zero, allocations are pushed to the edge of
-the grid, preserving the internal space containing the separate City of
-Leicester.
+Geographies with ‘holes’ are a particular challenge for grid layouts. In
+the example below, compactness is set to zero, meaning that allocations
+are pushed to the edge of the grid, preserving the internal space
+containing the separate City of Leicester.
 
 ``` r
 n_row <- 14
 n_col <- 14
 pts <- leics_wards |>
   st_drop_geometry() |>
-  select(ward_name, x = easting, y = northing)
+  select(area_name = ward_name, x = easting, y = northing)
 solution <- points_to_grid(pts, n_row, n_col, 0)
 ```
 
@@ -172,18 +201,20 @@ solution <- points_to_grid(pts, n_row, n_col, 0)
 
 ## Example Uses
 
-- [Beecham et al. 2021](https://eprints.whiterose.ac.uk/172944/) ‘On the
-  Use of ‘Glyphmaps’ for Analysing the Scale and Temporal Spread of
-  COVID-19 Reported Cases’, *ISPRS International Journal of
-  Geo-Information*, 10(4), pp. 213–.
+- Beecham, R., Dykes, J., Hama, L. and Lomax, N. (2021) ‘On the Use of
+  ‘Glyphmaps’ for Analysing the Scale and Temporal Spread of COVID-19
+  Reported Cases’, *ISPRS International Journal of Geo-Information*,
+  10(4), pp. 213–. doi:
+  [10.3390/ijgi10040213](https://doi.org/10.3390/ijgi10040213).
 
-- [Beecham and Slingsby
-  2019](https://journals.sagepub.com/doi/10.1177/0308518X19850580)
-  ‘Characterising labour market self-containment in London with
-  geographically arranged small multiples’, *Environment and Planning A:
-  Economy and Space*, 51(6), pp. 1217–1224.
+- Beecham, R. and Slingsby, A. (2019) ‘Characterising labour market
+  self-containment in London with geographically arranged small
+  multiples’, *Environment and Planning A: Economy and Space*, 51(6),
+  pp. 1217–1224. doi:
+  [10.1177/0308518X19850580](https://journals.sagepub.com/doi/10.1177/0308518X19850580).
 
-- [Wood et al. 2012](https://www.gicentre.net/featuredpapers)
-  ‘BallotMaps: Detecting name bias in alphabetically ordered ballot
-  papers’, *IEEE Transactions on Visualization and Computer Graphics*,
-  17(12), pp. 2384–2391.
+- Wood, J., Badawood, D., Dykes, J. and Slingsby, A. (2012) ‘BallotMaps:
+  Detecting name bias in alphabetically ordered ballot papers’, *IEEE
+  Transactions on Visualization and Computer Graphics*, 17(12),
+  pp. 2384–2391. doi:
+  [10.1109/TVCG.2011.174](https://doi.org/10.1109/TVCG.2011.174).

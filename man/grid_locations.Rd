@@ -22,5 +22,11 @@ Creates a list of grid locations of a stated size, with spacer positions
 removed.
 }
 \examples{
-grid_locations(n_row = 3, n_col = 3, spacers = list())
+
+grid <- grid_locations(n_row = 8, n_col = 8, spacers = list())
+grid
+
+}
+\author{
+Roger Beecham
 }
