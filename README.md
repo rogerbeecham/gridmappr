@@ -4,14 +4,16 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16878384.svg)](https://doi.org/10.5281/zenodo.16878384)
+
 <!-- badges: end -->
 
 ![](man/figures/teaser.svg)
 
 `gridmappr` is an R package that automates the process of generating
 [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a
-set of geographic point locations, it creates a grid (with stated *row,
-column* dimensions) and places each point in a grid cell such that the
+set of geographic point locations, it creates a grid with stated *row,
+column* dimensions, and places each point in a grid cell such that the
 distance between points in geographic space and that within the grid
 space is minimised. The package is an R implementation of Jo Wood’s
 Observable notebooks on [Linear
@@ -95,17 +97,13 @@ geography, at the expense of graphical space.
 pts <- france_deps |> st_drop_geometry() |>
   select(area_name = name, x, y)
 
-# Create gridmap layout,.
+# Create gridmap layout.
 solution <- points_to_grid(pts, n_row=10, n_col=10, compactness = .6)
 ```
 
 ![](./man/figures/france-10.svg)
 
 ``` r
-# Create df of point locations.
-pts <- france_deps |> st_drop_geometry() |>
-  select(area_name = name, x, y)
-
 # Create gridmap layout,.
 solution <- points_to_grid(pts, n_row=12, n_col=12, compactness = .6)
 ```
@@ -113,11 +111,7 @@ solution <- points_to_grid(pts, n_row=12, n_col=12, compactness = .6)
 ![](./man/figures/france-12.svg)
 
 ``` r
-# Create df of point locations.
-pts <- france_deps |> st_drop_geometry() |>
-  select(area_name = name, x, y)
-
-# Create gridmap layout,.
+# Create gridmap layout.
 solution <- points_to_grid(pts, n_row=14, n_col=14, compactness = .6)
 ```
 
@@ -126,20 +120,23 @@ solution <- points_to_grid(pts, n_row=14, n_col=14, compactness = .6)
 After some exploration, a 13x12 grid, seems to provide a reasonable
 balance between graphic space and geographic context (shape and
 adjacency). However, that layout implies that Corsica is contiguous with
-mainland France. At this point, it is worth adding spacers – grid cells
-that further constrain the distribution by not allowing points to be
-allocated to them. Spacers are defined as a list in `(row, column)`
+mainland France. At this point, it is worth adding *spacers* – grid
+cells that further constrain the distribution by not allowing points to
+be allocated to them. Spacers are defined as a list in `(row, column)`
 order with the origin `(1,1)` in bottom-left. To ensure Corsica is
 separated from mainland France, the first three rows from the 11th
 column and first two from the 10th column are excluded.
 
 ``` r
+# Spacers to separate Corsica from mainland.
 spacers <- list(
   c(1, 11), c(2, 11), c(3, 11), c(2,10), c(1,10)
 )
+# Point centroids for real départements.
 pts <- france_deps |>
   st_drop_geometry() |>
   select(area_name = name, x = x, y = y)
+
 solution <- points_to_grid(pts, 13, 12, .6, spacers)
 ```
 
@@ -147,16 +144,19 @@ solution <- points_to_grid(pts, 13, 12, .6, spacers)
 
 ### US States
 
-There are of course other well-known geographies, where some manual
+There are of course other well-known geographies where some manual
 control over the allocation is desirable. In a gridmap of the US, for
 example, separating Alaska, Hawaii and Puerto Rico.
 
 ``` r
+# Grid dimensions.
 n_row <- 7
 n_col <- 12
+# Point centroids for US states.
 pts <- us_states |>
   st_drop_geometry() |>
   select(area_name = STUSPS, x, y)
+# Derive layout solution.
 solution <- points_to_grid(pts, n_row, n_col, .8)
 ```
 
@@ -165,17 +165,21 @@ solution <- points_to_grid(pts, n_row, n_col, .8)
 Again this can be addressed by judiciously inserting spacers.
 
 ``` r
+# Grid dimensions.
 n_row <- 7
 n_col <- 12
+# Spacers to separate non-contiguous states from mainland.
 spacers <- list(
   c(4, 2), c(4, 3),
   c(3, 5), c(3, 4), c(3, 3), c(3, 12), c(3, 11),
   c(2, 4), c(2, 5), c(2, 6), c(2, 7), c(2, 8),
   c(1, 6)
 )
+# Point centroids for US states.
 pts <- us_states |>
   st_drop_geometry() |>
   select(area_name = STUSPS, x, y)
+# Derive layout solution.
 solution <- points_to_grid(pts, n_row, n_col, .9, spacers)
 ```
 
@@ -184,16 +188,19 @@ solution <- points_to_grid(pts, n_row, n_col, .9, spacers)
 ### Leicestershire Wards
 
 Geographies with ‘holes’ are a particular challenge for grid layouts. In
-the example below, compactness is set to zero, meaning that allocations
-are pushed to the edge of the grid, preserving the internal space
-containing the separate City of Leicester.
+the example below, *compactness* is set to zero, meaning that
+allocations are pushed to the edge of the grid, preserving the internal
+space containing the separate City of Leicester.
 
 ``` r
+# Grid dimensions.
 n_row <- 14
 n_col <- 14
+# Point centroids for Leicestershire wards.
 pts <- leics_wards |>
   st_drop_geometry() |>
   select(area_name = ward_name, x = easting, y = northing)
+# Derive layout solution.
 solution <- points_to_grid(pts, n_row, n_col, 0)
 ```
 
