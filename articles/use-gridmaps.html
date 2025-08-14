@@ -63,9 +63,9 @@
                         <h4 data-toc-skip class="author">Roger
 Beecham</h4>
             
-            <h4 data-toc-skip class="date">2025-06-20</h4>
+            <h4 data-toc-skip class="date">2025-08-14</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/rogerbeecham/gridmappr/blob/master/vignettes/use-gridmaps.Rmd" class="external-link"><code>vignettes/use-gridmaps.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rogerbeecham/gridmappr/blob/v0.2/vignettes/use-gridmaps.Rmd" class="external-link"><code>vignettes/use-gridmaps.Rmd</code></a></small>
       <div class="d-none name"><code>use-gridmaps.Rmd</code></div>
     </div>
 
@@ -376,7 +376,7 @@ in the gridmap <code>solution</code> file and transpose the
 <code>row</code> column up-front, as was necessary with the
 <code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid()</a></code> example. This allocation
 (<code>grid_data</code>) is then supplied to
-<code><a href="https://rdrr.io/pkg/geofacet/man/facet_geo.html" class="external-link">facet_geo()</a></code>.</p>
+<code><a href="https://hafen.github.io/geofacet/reference/facet_geo.html" class="external-link">facet_geo()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slight edits to solution dataset, as required by geofacet.</span></span>
 <span><span class="va">grid_data</span> <span class="op">&lt;-</span> <span class="va">solution</span> <span class="op">|&gt;</span> </span>
@@ -402,7 +402,7 @@ in the gridmap <code>solution</code> file and transpose the
 <span>  <span class="co"># Draw column charts.</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">rank</span>, y<span class="op">=</span><span class="va">dep_dist</span><span class="op">)</span>, width<span class="op">=</span><span class="fl">1</span>, fill<span class="op">=</span><span class="st">"#cb181d"</span>, alpha<span class="op">=</span><span class="fl">.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Call facet function and supply 'name' and the 'grid_data'. </span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/geofacet/man/facet_geo.html" class="external-link">facet_geo</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span>, grid<span class="op">=</span><span class="va">grid_data</span>, labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/as_labeller.html" class="external-link">as_labeller</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"^.{3}"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://hafen.github.io/geofacet/reference/facet_geo.html" class="external-link">facet_geo</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span>, grid<span class="op">=</span><span class="va">grid_data</span>, labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/as_labeller.html" class="external-link">as_labeller</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"^.{3}"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face<span class="op">=</span><span class="st">"bold"</span>, size<span class="op">=</span><span class="fl">10</span>, colour<span class="op">=</span><span class="st">"#636363"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/france-dist-geofacet.svg" style="width:50.0%"></p>
 <p>TODO: The data in some cells do not display. I’ve investiagted the
