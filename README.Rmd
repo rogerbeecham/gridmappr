@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-![](man/figures/teaser.svg)
+![](man/figures/teaser.png)
 
 `gridmappr` is an R package that automates the process of generating [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a set of geographic point locations, it creates a grid with stated *row, column* dimensions, and places each point in a grid cell such that the distance between points in geographic space and that within the grid space is minimised. The package is an R implementation of Jo Wood's Observable notebooks on [Linear Programming](https://observablehq.com/@jwolondon/hello-linear-programming) solvers and their application to the [Gridmap Allocation](https://observablehq.com/@jwolondon/gridmap-allocation?collection=@jwolondon/utilities) problem.
 
@@ -296,11 +296,7 @@ gridmap <- make_grid(leics_wards, n_row, n_col) |>
   ggplot() +
   geom_sf(fill = "transparent", colour = "#bdbdbd", linewidth = .6) +
   geom_sf(data= . %>% filter(!is.na(area_name)), fill = "#F1DDD1", colour = "#bdbdbd", linewidth = .6) +
-  geom_sf(
-    data = . %>% inner_join(spacers |> map_df(~ bind_rows(row = .x[1], col = .x[2]))),
-    colour = "#bdbdbd", linewidth = .6, fill = "#bdbdbd", alpha=.5
-  ) +
-  geom_text(aes(x = x, y = y, label = str_extract(ward_name, "^.{3}")), size = 4, colour = "#451C14") 
+  geom_text(aes(x = x, y = y, label = str_extract(area_name, "^.{3}")), size = 4, colour = "#451C14") 
 realmap <- leics_wards |>
   ggplot() +
   geom_sf(fill = "#F1DDD1", colour = "#ffffff", linewidth = .4) +

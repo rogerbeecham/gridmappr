@@ -8,7 +8,7 @@
 
 <!-- badges: end -->
 
-![](man/figures/teaser.svg)
+![](man/figures/teaser.png)
 
 `gridmappr` is an R package that automates the process of generating
 [small multiple gridmap layouts](https://www.gicentre.net/smwg). Given a
