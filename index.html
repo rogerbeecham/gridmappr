@@ -65,8 +65,9 @@
 </div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p><img src="reference/figures/teaser.svg"></p>
-<p><code>gridmappr</code> is an R package that automates the process of generating <a href="https://www.gicentre.net/smwg" class="external-link">small multiple gridmap layouts</a>. Given a set of geographic point locations, it creates a grid (with stated <em>row, column</em> dimensions) and places each point in a grid cell such that the distance between points in geographic space and that within the grid space is minimised. The package is an R implementation of Jo Wood’s Observable notebooks on <a href="https://observablehq.com/@jwolondon/hello-linear-programming" class="external-link">Linear Programming</a> solvers and their application to the <a href="https://observablehq.com/@jwolondon/gridmap-allocation?collection=@jwolondon/utilities" class="external-link">Gridmap Allocation</a> problem.</p>
+<p><code>gridmappr</code> is an R package that automates the process of generating <a href="https://www.gicentre.net/smwg" class="external-link">small multiple gridmap layouts</a>. Given a set of geographic point locations, it creates a grid with stated <em>row, column</em> dimensions, and places each point in a grid cell such that the distance between points in geographic space and that within the grid space is minimised. The package is an R implementation of Jo Wood’s Observable notebooks on <a href="https://observablehq.com/@jwolondon/hello-linear-programming" class="external-link">Linear Programming</a> solvers and their application to the <a href="https://observablehq.com/@jwolondon/gridmap-allocation?collection=@jwolondon/utilities" class="external-link">Gridmap Allocation</a> problem.</p>
 <div class="section level2">
 <h2 id="gridmap-allocation-using-compactness-with-points_to_grid">Gridmap allocation using compactness with <code>points_to_grid()</code>
 <a class="anchor" aria-label="anchor" href="#gridmap-allocation-using-compactness-with-points_to_grid"></a>
@@ -117,74 +118,79 @@
 <span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">france_deps</span> <span class="op">|&gt;</span> <span class="fu">st_drop_geometry</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span>area_name <span class="op">=</span> <span class="va">name</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create gridmap layout,.</span></span>
+<span><span class="co"># Create gridmap layout.</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, n_row<span class="op">=</span><span class="fl">10</span>, n_col<span class="op">=</span><span class="fl">10</span>, compactness <span class="op">=</span> <span class="fl">.6</span><span class="op">)</span></span></code></pre></div>
 <p><img src="./reference/figures/france-10.svg"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create df of point locations.</span></span>
-<span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">france_deps</span> <span class="op">|&gt;</span> <span class="fu">st_drop_geometry</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span>area_name <span class="op">=</span> <span class="va">name</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create gridmap layout,.</span></span>
+<code class="sourceCode R"><span><span class="co"># Create gridmap layout,.</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, n_row<span class="op">=</span><span class="fl">12</span>, n_col<span class="op">=</span><span class="fl">12</span>, compactness <span class="op">=</span> <span class="fl">.6</span><span class="op">)</span></span></code></pre></div>
 <p><img src="./reference/figures/france-12.svg"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create df of point locations.</span></span>
-<span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">france_deps</span> <span class="op">|&gt;</span> <span class="fu">st_drop_geometry</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span>area_name <span class="op">=</span> <span class="va">name</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create gridmap layout,.</span></span>
+<code class="sourceCode R"><span><span class="co"># Create gridmap layout.</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, n_row<span class="op">=</span><span class="fl">14</span>, n_col<span class="op">=</span><span class="fl">14</span>, compactness <span class="op">=</span> <span class="fl">.6</span><span class="op">)</span></span></code></pre></div>
 <p><img src="./reference/figures/france-14.svg"></p>
-<p>After some exploration, a 13x12 grid, seems to provide a reasonable balance between graphic space and geographic context (shape and adjacency). However, that layout implies that Corsica is contiguous with mainland France. At this point, it is worth adding spacers – grid cells that further constrain the distribution by not allowing points to be allocated to them. Spacers are defined as a list in <code>(row, column)</code> order with the origin <code>(1,1)</code> in bottom-left. To ensure Corsica is separated from mainland France, the first three rows from the 11th column and first two from the 10th column are excluded.</p>
+<p>After some exploration, a 13x12 grid, seems to provide a reasonable balance between graphic space and geographic context (shape and adjacency). However, that layout implies that Corsica is contiguous with mainland France. At this point, it is worth adding <em>spacers</em> – grid cells that further constrain the distribution by not allowing points to be allocated to them. Spacers are defined as a list in <code>(row, column)</code> order with the origin <code>(1,1)</code> in bottom-left. To ensure Corsica is separated from mainland France, the first three rows from the 11th column and first two from the 10th column are excluded.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spacers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="co"># Spacers to separate Corsica from mainland.</span></span>
+<span><span class="va">spacers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">11</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">11</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">11</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">10</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co"># Point centroids for real départements.</span></span>
 <span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">france_deps</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">st_drop_geometry</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span>area_name <span class="op">=</span> <span class="va">name</span>, x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, <span class="fl">13</span>, <span class="fl">12</span>, <span class="fl">.6</span>, <span class="va">spacers</span><span class="op">)</span></span></code></pre></div>
 <p><img src="./reference/figures/france-spacers.svg"></p>
 </div>
 <div class="section level3">
 <h3 id="us-states">US States<a class="anchor" aria-label="anchor" href="#us-states"></a>
 </h3>
-<p>There are of course other well-known geographies, where some manual control over the allocation is desirable. In a gridmap of the US, for example, separating Alaska, Hawaii and Puerto Rico.</p>
+<p>There are of course other well-known geographies where some manual control over the allocation is desirable. In a gridmap of the US, for example, separating Alaska, Hawaii and Puerto Rico.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
+<code class="sourceCode R"><span><span class="co"># Grid dimensions.</span></span>
+<span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
 <span><span class="va">n_col</span> <span class="op">&lt;-</span> <span class="fl">12</span></span>
+<span><span class="co"># Point centroids for US states.</span></span>
 <span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">us_states</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">st_drop_geometry</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span>area_name <span class="op">=</span> <span class="va">STUSPS</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span><span class="co"># Derive layout solution.</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, <span class="va">n_row</span>, <span class="va">n_col</span>, <span class="fl">.8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="./reference/figures/us-no-spacers.svg"></p>
 <p>Again this can be addressed by judiciously inserting spacers.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
+<code class="sourceCode R"><span><span class="co"># Grid dimensions.</span></span>
+<span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
 <span><span class="va">n_col</span> <span class="op">&lt;-</span> <span class="fl">12</span></span>
+<span><span class="co"># Spacers to separate non-contiguous states from mainland.</span></span>
 <span><span class="va">spacers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">3</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">12</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">11</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">8</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co"># Point centroids for US states.</span></span>
 <span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">us_states</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">st_drop_geometry</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span>area_name <span class="op">=</span> <span class="va">STUSPS</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span><span class="co"># Derive layout solution.</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, <span class="va">n_row</span>, <span class="va">n_col</span>, <span class="fl">.9</span>, <span class="va">spacers</span><span class="op">)</span></span></code></pre></div>
 <p><img src="./reference/figures/us-spacers.svg"></p>
 </div>
 <div class="section level3">
 <h3 id="leicestershire-wards">Leicestershire Wards<a class="anchor" aria-label="anchor" href="#leicestershire-wards"></a>
 </h3>
-<p>Geographies with ‘holes’ are a particular challenge for grid layouts. In the example below, compactness is set to zero, meaning that allocations are pushed to the edge of the grid, preserving the internal space containing the separate City of Leicester.</p>
+<p>Geographies with ‘holes’ are a particular challenge for grid layouts. In the example below, <em>compactness</em> is set to zero, meaning that allocations are pushed to the edge of the grid, preserving the internal space containing the separate City of Leicester.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">14</span></span>
+<code class="sourceCode R"><span><span class="co"># Grid dimensions.</span></span>
+<span><span class="va">n_row</span> <span class="op">&lt;-</span> <span class="fl">14</span></span>
 <span><span class="va">n_col</span> <span class="op">&lt;-</span> <span class="fl">14</span></span>
+<span><span class="co"># Point centroids for Leicestershire wards.</span></span>
 <span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="va">leics_wards</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">st_drop_geometry</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span>area_name <span class="op">=</span> <span class="va">ward_name</span>, x <span class="op">=</span> <span class="va">easting</span>, y <span class="op">=</span> <span class="va">northing</span><span class="op">)</span></span>
+<span><span class="co"># Derive layout solution.</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/points_to_grid.html">points_to_grid</a></span><span class="op">(</span><span class="va">pts</span>, <span class="va">n_row</span>, <span class="va">n_col</span>, <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="./reference/figures/leics.svg"></p>
 </div>
@@ -234,6 +240,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/rogerbeecham/gridmappr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://doi.org/10.5281/zenodo.16878384" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.16878384.svg" alt="DOI"></a></li>
 </ul>
 </div>
 
